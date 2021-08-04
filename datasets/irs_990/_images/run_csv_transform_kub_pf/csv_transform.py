@@ -295,6 +295,7 @@ def rename_headers(df) :
 
     header_names = {
         'ELF' : 'elf' ,
+        'ELFCD' : 'elf' ,
         'EIN' : 'ein' ,
         'TAX_PRD' : 'tax_prd' ,
         'EOSTATUS' : 'eostatus' ,
@@ -374,6 +375,7 @@ def rename_headers(df) :
         'CLAIMSTATCD' : 'claimstatcd' ,
         'CNTRBTRSTXYRCD' : 'cntrbtrstxyrcd' ,
         'DISTRIBDAFCD' : 'distribdafcd' ,
+        'ACQDRINDRINTCD' : 'distribdafcd' ,
         'ORGCMPLYPUBCD' : 'orgcmplypubcd' ,
         'FILEDLF1041IND' : 'filedlf1041ind' ,
         'PROPEXCHCD' : 'propexchcd' ,

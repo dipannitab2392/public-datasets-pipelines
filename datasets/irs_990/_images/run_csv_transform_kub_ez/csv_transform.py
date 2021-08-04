@@ -188,6 +188,7 @@ def rename_headers(df) :
     header_names = {
         'EIN' : 'ein',
         'a_tax_prd' : 'tax_pd',
+        'taxpd' : 'tax_pd',
         'subseccd' : 'subseccd',
         'prgmservrev' : 'prgmservrev',
         'duesassesmnts' : 'duesassesmnts',
