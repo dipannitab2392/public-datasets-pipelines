@@ -17,14 +17,14 @@ resources:
 
   - type: bigquery_table
     # Required Properties:
-    table_id: irs_990_ez_2016
+    table_id: irs_990_ez_2014
 
     # Description of the table
-    description: "irs_990_ez_2016 dataset"
+    description: "irs_990_ez_2014 dataset"
 
 dag:
   initialize:
-    dag_id: irs_990_ez_2016
+    dag_id: irs_990_ez_2014
     default_args:
       owner: "Google"
 
@@ -44,12 +44,12 @@ dag:
 
       args:
 
-        task_id: "irs_990_ez_2016_transform_csv"
+        task_id: "irs_990_ez_2014_transform_csv"
 
         startup_timeout_seconds: 600
 
         # The name of the pod in which the task will run. This will be used (plus a random suffix) to generate a pod id
-        name: "irs_990_ez_2016"
+        name: "irs_990_ez_2014"
 
         # The namespace to run within Kubernetes. Always set its value to "default" because we follow the guideline that KubernetesPodOperator will only be used for very light workloads, i.e. use the Cloud Composer environment's resources without starving other pipelines.
         namespace: "default"
@@ -57,15 +57,15 @@ dag:
         image_pull_policy: "Always"
 
         # Docker images will be built and pushed to GCR by default whenever the `scripts/generate_dag.py` is run. To skip building and pushing images, use the optional `--skip-builds` flag.
-        image: "{{ var.json.irs_990_irs_990_ez_2016.container_registry.run_csv_transform_kub_ez }}"
+        image: "{{ var.json.irs_990_irs_990_ez_2014.container_registry.run_csv_transform_kub_ez }}"
 
         # Set the environment variables you need initialized in the container. Use these as input variables for the script your container is expected to perform.
         env_vars:
-          SOURCE_URL: "https://www.irs.gov/pub/irs-soi/16eofinextractez.dat"
+          SOURCE_URL: "https://www.irs.gov/pub/irs-soi/14eofinextract990ez.zip"
           SOURCE_FILE: "files/data.dat"
           TARGET_FILE: "files/data_output.csv"
           TARGET_GCS_BUCKET: "{{ var.json.shared.composer_bucket }}"
-          TARGET_GCS_PATH: "data/irs_990/irs_990_ez_2016/data_output.csv"
+          TARGET_GCS_PATH: "data/irs_990/irs_990_ez_2014/data_output.csv"
 
         # Set resource limits for the pod here. For resource units in Kubernetes, see https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#resource-units-in-kubernetes
         resources:
@@ -77,15 +77,15 @@ dag:
 
       args:
 
-        task_id: "load_irs_990_ez_2016_to_bq"
+        task_id: "load_irs_990_ez_2014_to_bq"
 
         # The GCS bucket where the CSV file is located in.
         bucket: "{{ var.json.shared.composer_bucket }}"
 
         # The GCS object path for the CSV file
-        source_objects: ["data/irs_990/irs_990_ez_2016/data_output.csv"]
+        source_objects: ["data/irs_990/irs_990_ez_2014/data_output.csv"]
         source_format: "CSV"
-        destination_project_dataset_table: "irs_990.irs_990_ez_2016"
+        destination_project_dataset_table: "irs_990.irs_990_ez_2014"
 
         # Use this if your CSV file contains a header row
         skip_leading_rows: 1
@@ -104,10 +104,6 @@ dag:
             type       : "string"
             description: "Employer Identification Number"
             mode       : "required"
-          - name       : "elf"
-            type       : "string"
-            description: "E-file indicator"
-            mode       : "nullable"
           - name       : "tax_pd"
             type       : "integer"
             description: "Tax period"
@@ -391,7 +387,7 @@ dag:
 
 
   graph_paths:
-    - "irs_990_ez_2016_transform_csv >> load_irs_990_ez_2016_to_bq"
+    - "irs_990_ez_2014_transform_csv >> load_irs_990_ez_2014_to_bq"
 
 
 

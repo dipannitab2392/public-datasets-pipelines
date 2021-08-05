@@ -39,7 +39,7 @@ with DAG(
         name="irs_990_ez_2016",
         namespace="default",
         image_pull_policy="Always",
-        image="{{ var.json.irs_990.container_registry.run_csv_transform_kub_ez }}",
+        image="{{ var.json.irs_990_irs_990_ez_2016.container_registry.run_csv_transform_kub_ez }}",
         env_vars={
             "SOURCE_URL": "https://www.irs.gov/pub/irs-soi/16eofinextractez.dat",
             "SOURCE_FILE": "files/data.dat",
@@ -47,7 +47,7 @@ with DAG(
             "TARGET_GCS_BUCKET": "{{ var.json.shared.composer_bucket }}",
             "TARGET_GCS_PATH": "data/irs_990/irs_990_ez_2016/data_output.csv",
         },
-        resources={"request_memory": "4G", "request_cpu": "2"},
+        resources={"request_memory": "4G", "request_cpu": "1"},
     )
 
     # Task to load CSV data to a BigQuery table
