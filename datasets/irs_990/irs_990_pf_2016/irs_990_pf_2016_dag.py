@@ -47,7 +47,7 @@ with DAG(
             "TARGET_GCS_BUCKET": "{{ var.json.shared.composer_bucket }}",
             "TARGET_GCS_PATH": "data/irs_990/irs_990_pf_2016/data_output.csv",
         },
-        resources={"request_memory": "4G", "request_cpu": "1"},
+        resources={"request_memory": "2G", "request_cpu": "1"},
     )
 
     # Task to load CSV data to a BigQuery table

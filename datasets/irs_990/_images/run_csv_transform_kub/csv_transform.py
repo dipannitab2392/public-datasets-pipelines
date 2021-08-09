@@ -78,273 +78,34 @@ def main(
 
     if os.path.basename(urlparse(source_url).path) == "14eofinextract990.zip":
         df = pd.read_csv(
-            str(source_file), compression="zip", encoding="utf-8", sep="\s+"
+            str(source_file), compression="zip", encoding="utf-8", sep=r"\s+"
         )
     else:
-        df = pd.read_csv(str(source_file), encoding="utf-8", sep="\s+")
+        df = pd.read_csv(str(source_file), encoding="utf-8", sep=r"\s+")
 
     # steps in the pipeline
     logging.info(f"Transforming.. {source_file}")
 
     logging.info(f"Transform: Rename columns.. {source_file}")
-    header_names = {
-        "elf": "elf",
-        "EIN": "ein",
-        "tax_prd": "tax_pd",
-        "subseccd": "subseccd",
-        "s50Yc3or4947aYcd": "s501c3or4947a1cd",
-        "schdbind": "schdbind",
-        "politicalactvtscd": "politicalactvtscd",
-        "lbbyingactvtscd": "lbbyingactvtscd",
-        "subjto6033cd": "subjto6033cd",
-        "dnradvisedfundscd": "dnradvisedfundscd",
-        "prptyintrcvdcd": "prptyintrcvdcd",
-        "maintwrkofartcd": "maintwrkofartcd",
-        "crcounselingqstncd": "crcounselingqstncd",
-        "hldassetsintermpermcd": "hldassetsintermpermcd",
-        "rptlndbldgeqptcd": "rptlndbldgeqptcd",
-        "rptinvstothsecd": "rptinvstothsecd",
-        "rptinvstprgrelcd": "rptinvstprgrelcd",
-        "rptothasstcd": "rptothasstcd",
-        "rptothliabcd": "rptothliabcd",
-        "sepcnsldtfinstmtcd": "sepcnsldtfinstmtcd",
-        "sepindaudfinstmtcd": "sepindaudfinstmtcd",
-        "inclinfinstmtcd": "inclinfinstmtcd",
-        "operateschoolsY70cd": "operateschools170cd",
-        "frgnofficecd": "frgnofficecd",
-        "frgnrevexpnscd": "frgnrevexpnscd",
-        "frgngrntscd": "frgngrntscd",
-        "frgnaggragrntscd": "frgnaggragrntscd",
-        "rptprofndrsngfeescd": "rptprofndrsngfeescd",
-        "rptincfnndrsngcd": "rptincfnndrsngcd",
-        "rptincgamingcd": "rptincgamingcd",
-        "operatehosptlcd": "operatehosptlcd",
-        "hospaudfinstmtcd": "hospaudfinstmtcd",
-        "rptgrntstogovtcd": "rptgrntstogovtcd",
-        "rptgrntstoindvcd": "rptgrntstoindvcd",
-        "rptyestocompnstncd": "rptyestocompnstncd",
-        "txexmptbndcd": "txexmptbndcd",
-        "invstproceedscd": "invstproceedscd",
-        "maintescrwaccntcd": "maintescrwaccntcd",
-        "actonbehalfcd": "actonbehalfcd",
-        "engageexcessbnftcd": "engageexcessbnftcd",
-        "awarexcessbnftcd": "awarexcessbnftcd",
-        "loantofficercd": "loantofficercd",
-        "grantoofficercd": "grantoofficercd",
-        "dirbusnreltdcd": "dirbusnreltdcd",
-        "fmlybusnreltdcd": "fmlybusnreltdcd",
-        "servasofficercd": "servasofficercd",
-        "recvnoncashcd": "recvnoncashcd",
-        "recvartcd": "recvartcd",
-        "ceaseoperationscd": "ceaseoperationscd",
-        "sellorexchcd": "sellorexchcd",
-        "ownsepentcd": "ownsepentcd",
-        "reltdorgcd": "reltdorgcd",
-        "intincntrlcd": "intincntrlcd",
-        "orgtrnsfrcd": "orgtrnsfrcd",
-        "conduct5percentcd": "conduct5percentcd",
-        "compltschocd": "compltschocd",
-        "f1096cnt": "f1096cnt",
-        "fw2gcnt": "fw2gcnt",
-        "wthldngrulescd": "wthldngrulescd",
-        "noemplyeesw3cnt": "noemplyeesw3cnt",
-        "filerqrdrtnscd": "filerqrdrtnscd",
-        "unrelbusinccd": "unrelbusinccd",
-        "filedf990tcd": "filedf990tcd",
-        "frgnacctcd": "frgnacctcd",
-        "prohibtdtxshltrcd": "prohibtdtxshltrcd",
-        "prtynotifyorgcd": "prtynotifyorgcd",
-        "filedf8886tcd": "filedf8886tcd",
-        "solicitcntrbcd": "solicitcntrbcd",
-        "exprstmntcd": "exprstmntcd",
-        "providegoodscd": "providegoodscd",
-        "notfydnrvalcd": "notfydnrvalcd",
-        "filedf8N8Ncd": "filedf8282cd",
-        "f8282cnt": "f8282cnt",
-        "fndsrcvdcd": "fndsrcvdcd",
-        "premiumspaidcd": "premiumspaidcd",
-        "filedf8899cd": "filedf8899cd",
-        "filedfY098ccd": "filedf1098ccd",
-        "excbushldngscd": "excbushldngscd",
-        "s4966distribcd": "s4966distribcd",
-        "distribtodonorcd": "distribtodonorcd",
-        "initiationfees": "initiationfees",
-        "grsrcptspublicuse": "grsrcptspublicuse",
-        "grsincmembers": "grsincmembers",
-        "grsincother": "grsincother",
-        "filedlieufY04Ycd": "filedlieuf1041cd",
-        "txexmptint": "txexmptint",
-        "qualhlthplncd": "qualhlthplncd",
-        "qualhlthreqmntn": "qualhlthreqmntn",
-        "qualhlthonhnd": "qualhlthonhnd",
-        "rcvdpdtngcd": "rcvdpdtngcd",
-        "filedf7N0cd": "filedf720cd",
-        "totreprtabled": "totreprtabled",
-        "totcomprelatede": "totcomprelatede",
-        "totestcompf": "totestcompf",
-        "noindiv100kcnt": "noindiv100kcnt",
-        "nocontractor100kcnt": "nocontractor100kcnt",
-        "totcntrbgfts": "totcntrbgfts",
-        "prgmservcode2acd": "prgmservcode2acd",
-        "totrev2acola": "totrev2acola",
-        "prgmservcode2bcd": "prgmservcode2bcd",
-        "totrev2bcola": "totrev2bcola",
-        "prgmservcode2ccd": "prgmservcode2ccd",
-        "totrev2ccola": "totrev2ccola",
-        "prgmservcode2dcd": "prgmservcode2dcd",
-        "totrev2dcola": "totrev2dcola",
-        "prgmservcode2ecd": "prgmservcode2ecd",
-        "totrev2ecola": "totrev2ecola",
-        "totrev2fcola": "totrev2fcola",
-        "totprgmrevnue": "totprgmrevnue",
-        "invstmntinc": "invstmntinc",
-        "txexmptbndsproceeds": "txexmptbndsproceeds",
-        "royaltsinc": "royaltsinc",
-        "grsrntsreal": "grsrntsreal",
-        "grsrntsprsnl": "grsrntsprsnl",
-        "rntlexpnsreal": "rntlexpnsreal",
-        "rntlexpnsprsnl": "rntlexpnsprsnl",
-        "rntlincreal": "rntlincreal",
-        "rntlincprsnl": "rntlincprsnl",
-        "netrntlinc": "netrntlinc",
-        "grsalesecur": "grsalesecur",
-        "grsalesothr": "grsalesothr",
-        "cstbasisecur": "cstbasisecur",
-        "cstbasisothr": "cstbasisothr",
-        "gnlsecur": "gnlsecur",
-        "gnlsothr": "gnlsothr",
-        "netgnls": "netgnls",
-        "grsincfndrsng": "grsincfndrsng",
-        "lessdirfndrsng": "lessdirfndrsng",
-        "netincfndrsng": "netincfndrsng",
-        "grsincgaming": "grsincgaming",
-        "lessdirgaming": "lessdirgaming",
-        "netincgaming": "netincgaming",
-        "grsalesinvent": "grsalesinvent",
-        "lesscstofgoods": "lesscstofgoods",
-        "netincsales": "netincsales",
-        "miscrev11acd": "miscrev11acd",
-        "miscrevtota": "miscrevtota",
-        "miscrev11bcd": "miscrev11bcd",
-        "miscrevtot11b": "miscrevtot11b",
-        "miscrev11ccd": "miscrev11ccd",
-        "miscrevtot11c": "miscrevtot11c",
-        "miscrevtot11d": "miscrevtot11d",
-        "miscrevtot11e": "miscrevtot11e",
-        "totrevenue": "totrevenue",
-        "grntstogovt": "grntstogovt",
-        "grnsttoindiv": "grnsttoindiv",
-        "grntstofrgngovt": "grntstofrgngovt",
-        "benifitsmembrs": "benifitsmembrs",
-        "compnsatncurrofcr": "compnsatncurrofcr",
-        "compnsatnandothr": "compnsatnandothr",
-        "othrsalwages": "othrsalwages",
-        "pensionplancontrb": "pensionplancontrb",
-        "othremplyeebenef": "othremplyeebenef",
-        "payrolltx": "payrolltx",
-        "feesforsrvcmgmt": "feesforsrvcmgmt",
-        "legalfees": "legalfees",
-        "accntingfees": "accntingfees",
-        "feesforsrvclobby": "feesforsrvclobby",
-        "profndraising": "profndraising",
-        "feesforsrvcinvstmgmt": "feesforsrvcinvstmgmt",
-        "feesforsrvcothr": "feesforsrvcothr",
-        "advrtpromo": "advrtpromo",
-        "officexpns": "officexpns",
-        "infotech": "infotech",
-        "royaltsexpns": "royaltsexpns",
-        "occupancy": "occupancy",
-        "travel": "travel",
-        "travelofpublicoffcl": "travelofpublicoffcl",
-        "converconventmtng": "converconventmtng",
-        "interestamt": "interestamt",
-        "pymtoaffiliates": "pymtoaffiliates",
-        "deprcatndepletn": "deprcatndepletn",
-        "insurance": "insurance",
-        "othrexpnsa": "othrexpnsa",
-        "othrexpnsb": "othrexpnsb",
-        "othrexpnsc": "othrexpnsc",
-        "othrexpnsd": "othrexpnsd",
-        "othrexpnse": "othrexpnse",
-        "othrexpnsf": "othrexpnsf",
-        "totfuncexpns": "totfuncexpns",
-        "nonintcashend": "nonintcashend",
-        "svngstempinvend": "svngstempinvend",
-        "pldgegrntrcvblend": "pldgegrntrcvblend",
-        "accntsrcvblend": "accntsrcvblend",
-        "currfrmrcvblend": "currfrmrcvblend",
-        "rcvbldisqualend": "rcvbldisqualend",
-        "notesloansrcvblend": "notesloansrcvblend",
-        "invntriesalesend": "invntriesalesend",
-        "prepaidexpnsend": "prepaidexpnsend",
-        "lndbldgsequipend": "lndbldgsequipend",
-        "invstmntsend": "invstmntsend",
-        "invstmntsothrend": "invstmntsothrend",
-        "invstmntsprgmend": "invstmntsprgmend",
-        "intangibleassetsend": "intangibleassetsend",
-        "othrassetsend": "othrassetsend",
-        "totassetsend": "totassetsend",
-        "accntspayableend": "accntspayableend",
-        "grntspayableend": "grntspayableend",
-        "deferedrevnuend": "deferedrevnuend",
-        "txexmptbndsend": "txexmptbndsend",
-        "escrwaccntliabend": "escrwaccntliabend",
-        "paybletoffcrsend": "paybletoffcrsend",
-        "secrdmrtgsend": "secrdmrtgsend",
-        "unsecurednotesend": "unsecurednotesend",
-        "othrliabend": "othrliabend",
-        "totliabend": "totliabend",
-        "unrstrctnetasstsend": "unrstrctnetasstsend",
-        "temprstrctnetasstsend": "temprstrctnetasstsend",
-        "permrstrctnetasstsend": "permrstrctnetasstsend",
-        "capitalstktrstend": "capitalstktrstend",
-        "paidinsurplusend": "paidinsurplusend",
-        "retainedearnend": "retainedearnend",
-        "totnetassetend": "totnetassetend",
-        "totnetliabastend": "totnetliabastend",
-        "nonpfrea": "nonpfrea",
-        "totnooforgscnt": "totnooforgscnt",
-        "totsupport": "totsupport",
-        "gftgrntsrcvd170": "gftgrntsrcvd170",
-        "txrevnuelevied170": "txrevnuelevied170",
-        "srvcsval170": "srvcsval170",
-        "pubsuppsubtot170": "pubsuppsubtot170",
-        "exceeds2pct170": "exceeds2pct170",
-        "pubsupplesspct170": "pubsupplesspct170",
-        "samepubsuppsubtot170": "samepubsuppsubtot170",
-        "grsinc170": "grsinc170",
-        "netincunreltd170": "netincunreltd170",
-        "othrinc170": "othrinc170",
-        "totsupp170": "totsupp170",
-        "grsrcptsrelated170": "grsrcptsrelated170",
-        "totgftgrntrcvd509": "totgftgrntrcvd509",
-        "grsrcptsadmissn509": "grsrcptsadmissn509",
-        "grsrcptsactivities509": "grsrcptsactivities509",
-        "txrevnuelevied509": "txrevnuelevied509",
-        "srvcsval509": "srvcsval509",
-        "pubsuppsubtot509": "pubsuppsubtot509",
-        "rcvdfrmdisqualsub509": "rcvdfrmdisqualsub509",
-        "exceeds1pct509": "exceeds1pct509",
-        "subtotpub509": "subtotpub509",
-        "pubsupplesub509": "pubsupplesub509",
-        "samepubsuppsubtot509": "samepubsuppsubtot509",
-        "grsinc509": "grsinc509",
-        "unreltxincls511tx509": "unreltxincls511tx509",
-        "subtotsuppinc509": "subtotsuppinc509",
-        "netincunrelatd509": "netincunrelatd509",
-        "othrinc509": "othrinc509",
-        "totsupp509": "totsupp509",
-    }
 
-    df.rename(columns=header_names, inplace=True)
+    rename_headers(df)
 
     logging.info(f"Transform: filtering null values.. {source_file}")
 
     filter_null_rows(df)
 
-    logging.info("Transform: Reordering headers..")
+    logging.info("Transform: Converting to integr.. ")
+
+    df["totsupp509"] =  df["totsupp509"].apply(convert_to_int)
+
+    logging.info(
+        f"Transform: Reordering headers for.. {os.path.basename(urlparse(source_url).path)}"
+    )
 
     if os.path.basename(urlparse(source_url).path) == "14eofinextract990.zip":
+
+        logging.info("satisfied .zip condition ...")
+
         df = df[
             [
                 "ein",
@@ -595,6 +356,7 @@ def main(
             ]
         ]
     else:
+        logging.info("satisfied .dat condition ...")
         df = df[
             [
                 "ein",
@@ -846,24 +608,6 @@ def main(
             ]
         ]
 
-    # df.fillna("")
-
-    # convert data type format to integer
-    # df["unique_key"] = df["unique_key"].apply(convert_to_int)
-    # df["beat"] = df["beat"].apply(convert_to_int)
-    # df["district"] = df["district"].apply(convert_to_int)
-    # df["ward"] = df["ward"].apply(convert_to_int)
-    # df["community_area"] = df["community_area"].apply(convert_to_int)
-    # df["year"] = df["year"].apply(convert_to_int)
-
-    # # convert data type format to float
-    # df["x_coordinate"] = df["x_coordinate"].apply(resolve_nan)
-    # df["y_coordinate"] = df["y_coordinate"].apply(resolve_nan)
-    # df["latitude"] = df["latitude"].apply(resolve_nan)
-    # df["longitude"] = df["longitude"].apply(resolve_nan)
-
-    # pdb.set_trace()
-
     # save to output file
     logging.info(f"Saving to output file.. {target_file}")
     try:
@@ -883,77 +627,256 @@ def main(
     )
 
 
-def resolve_nan(input: str) -> str:
-    str_val = ""
-    if input == "" or (math.isnan(input)):
-        str_val = ""
-    else:
-        str_val = str(input)
-    return str_val.replace("None", "")
-
-
-def convert_to_int(input: str) -> str:
-    str_val = ""
-    if input == "" or (math.isnan(input)):
-        str_val = ""
-    else:
-        str_val = str(int(round(input, 0)))
-    return str_val
-
-
-# def rename_headers(df):
-#     header_names = {
-#         "ID": "unique_key",
-#         "Case Number": "case_number",
-#         "Date": "date",
-#         "Block": "block",
-#         "IUCR": "iucr",
-#         "Primary Type": "primary_type",
-#         "Description": "description",
-#         "Location Description": "location_description",
-#         "Arrest": "arrest",
-#         "Domestic": "domestic",
-#         "Beat": "beat",
-#         "District": "district",
-#         "Ward": "ward",
-#         "Community Area": "community_area",
-#         "FBI Code": "fbi_code",
-#         "X Coordinate": "x_coordinate",
-#         "Y Coordinate": "y_coordinate",
-#         "Year": "year",
-#         "Updated On": "updated_on",
-#         "Latitude": "latitude",
-#         "Longitude": "longitude",
-#         "Location": "location"
-#     }
-
-#     for old_name, new_name in header_names.items():
-#         df.rename(old_name, new_name)
-
-
-# def convert_dt_format(dt_str):
-#     # Old format: MM/dd/yyyy hh:mm:ss aa
-#     # New format: yyyy-MM-dd HH:mm:ss
-#     if dt_str is None or len(dt_str) == 0:
-#         return dt_str
-#     else:
-#         return datetime.datetime.strptime(dt_str, "%m/%d/%Y %H:%M:%S %p").strftime(
-#             "%Y-%m-%d %H:%M:%S"
-#         )
-
-
-# def convert_values(df):
-#     dt_cols = [
-#         "date" ,
-#         "updated_on"
-#     ]
-
-#     for dt_col in dt_cols:
-#         df[dt_col] = df[dt_col].apply(convert_dt_format)
-
-# int_cols = ["city_asset_number"]
-# for int_col in int_cols:
-#     df[int_col] = df[int_col].astype('Int64')
+def rename_headers(df):
+    header_names = {
+        "elf": "elf",
+        "EIN": "ein",
+        "tax_prd": "tax_pd",
+        "subseccd": "subseccd",
+        "s50Yc3or4947aYcd": "s501c3or4947a1cd",
+        "schdbind": "schdbind",
+        "politicalactvtscd": "politicalactvtscd",
+        "lbbyingactvtscd": "lbbyingactvtscd",
+        "subjto6033cd": "subjto6033cd",
+        "dnradvisedfundscd": "dnradvisedfundscd",
+        "prptyintrcvdcd": "prptyintrcvdcd",
+        "maintwrkofartcd": "maintwrkofartcd",
+        "crcounselingqstncd": "crcounselingqstncd",
+        "hldassetsintermpermcd": "hldassetsintermpermcd",
+        "rptlndbldgeqptcd": "rptlndbldgeqptcd",
+        "rptinvstothsecd": "rptinvstothsecd",
+        "rptinvstprgrelcd": "rptinvstprgrelcd",
+        "rptothasstcd": "rptothasstcd",
+        "rptothliabcd": "rptothliabcd",
+        "sepcnsldtfinstmtcd": "sepcnsldtfinstmtcd",
+        "sepindaudfinstmtcd": "sepindaudfinstmtcd",
+        "inclinfinstmtcd": "inclinfinstmtcd",
+        "operateschoolsY70cd": "operateschools170cd",
+        "frgnofficecd": "frgnofficecd",
+        "frgnrevexpnscd": "frgnrevexpnscd",
+        "frgngrntscd": "frgngrntscd",
+        "frgnaggragrntscd": "frgnaggragrntscd",
+        "rptprofndrsngfeescd": "rptprofndrsngfeescd",
+        "rptincfnndrsngcd": "rptincfnndrsngcd",
+        "rptincgamingcd": "rptincgamingcd",
+        "operatehosptlcd": "operatehosptlcd",
+        "hospaudfinstmtcd": "hospaudfinstmtcd",
+        "rptgrntstogovtcd": "rptgrntstogovtcd",
+        "rptgrntstoindvcd": "rptgrntstoindvcd",
+        "rptyestocompnstncd": "rptyestocompnstncd",
+        "txexmptbndcd": "txexmptbndcd",
+        "invstproceedscd": "invstproceedscd",
+        "maintescrwaccntcd": "maintescrwaccntcd",
+        "actonbehalfcd": "actonbehalfcd",
+        "engageexcessbnftcd": "engageexcessbnftcd",
+        "awarexcessbnftcd": "awarexcessbnftcd",
+        "loantofficercd": "loantofficercd",
+        "grantoofficercd": "grantoofficercd",
+        "dirbusnreltdcd": "dirbusnreltdcd",
+        "fmlybusnreltdcd": "fmlybusnreltdcd",
+        "servasofficercd": "servasofficercd",
+        "recvnoncashcd": "recvnoncashcd",
+        "recvartcd": "recvartcd",
+        "ceaseoperationscd": "ceaseoperationscd",
+        "sellorexchcd": "sellorexchcd",
+        "ownsepentcd": "ownsepentcd",
+        "reltdorgcd": "reltdorgcd",
+        "intincntrlcd": "intincntrlcd",
+        "orgtrnsfrcd": "orgtrnsfrcd",
+        "conduct5percentcd": "conduct5percentcd",
+        "compltschocd": "compltschocd",
+        "f1096cnt": "f1096cnt",
+        "fw2gcnt": "fw2gcnt",
+        "wthldngrulescd": "wthldngrulescd",
+        "noemplyeesw3cnt": "noemplyeesw3cnt",
+        "filerqrdrtnscd": "filerqrdrtnscd",
+        "unrelbusinccd": "unrelbusinccd",
+        "filedf990tcd": "filedf990tcd",
+        "frgnacctcd": "frgnacctcd",
+        "prohibtdtxshltrcd": "prohibtdtxshltrcd",
+        "prtynotifyorgcd": "prtynotifyorgcd",
+        "filedf8886tcd": "filedf8886tcd",
+        "solicitcntrbcd": "solicitcntrbcd",
+        "exprstmntcd": "exprstmntcd",
+        "providegoodscd": "providegoodscd",
+        "notfydnrvalcd": "notfydnrvalcd",
+        "filedf8N8Ncd": "filedf8282cd",
+        "f8282cnt": "f8282cnt",
+        "fndsrcvdcd": "fndsrcvdcd",
+        "premiumspaidcd": "premiumspaidcd",
+        "filedf8899cd": "filedf8899cd",
+        "filedfY098ccd": "filedf1098ccd",
+        "excbushldngscd": "excbushldngscd",
+        "s4966distribcd": "s4966distribcd",
+        "distribtodonorcd": "distribtodonorcd",
+        "initiationfees": "initiationfees",
+        "grsrcptspublicuse": "grsrcptspublicuse",
+        "grsincmembers": "grsincmembers",
+        "grsincother": "grsincother",
+        "filedlieufY04Ycd": "filedlieuf1041cd",
+        "txexmptint": "txexmptint",
+        "qualhlthplncd": "qualhlthplncd",
+        "qualhlthreqmntn": "qualhlthreqmntn",
+        "qualhlthonhnd": "qualhlthonhnd",
+        "rcvdpdtngcd": "rcvdpdtngcd",
+        "filedf7N0cd": "filedf720cd",
+        "totreprtabled": "totreprtabled",
+        "totcomprelatede": "totcomprelatede",
+        "totestcompf": "totestcompf",
+        "noindiv100kcnt": "noindiv100kcnt",
+        "nocontractor100kcnt": "nocontractor100kcnt",
+        "totcntrbgfts": "totcntrbgfts",
+        "prgmservcode2acd": "prgmservcode2acd",
+        "totrev2acola": "totrev2acola",
+        "prgmservcode2bcd": "prgmservcode2bcd",
+        "totrev2bcola": "totrev2bcola",
+        "prgmservcode2ccd": "prgmservcode2ccd",
+        "totrev2ccola": "totrev2ccola",
+        "prgmservcode2dcd": "prgmservcode2dcd",
+        "totrev2dcola": "totrev2dcola",
+        "prgmservcode2ecd": "prgmservcode2ecd",
+        "totrev2ecola": "totrev2ecola",
+        "totrev2fcola": "totrev2fcola",
+        "totprgmrevnue": "totprgmrevnue",
+        "invstmntinc": "invstmntinc",
+        "txexmptbndsproceeds": "txexmptbndsproceeds",
+        "royaltsinc": "royaltsinc",
+        "grsrntsreal": "grsrntsreal",
+        "grsrntsprsnl": "grsrntsprsnl",
+        "rntlexpnsreal": "rntlexpnsreal",
+        "rntlexpnsprsnl": "rntlexpnsprsnl",
+        "rntlincreal": "rntlincreal",
+        "rntlincprsnl": "rntlincprsnl",
+        "netrntlinc": "netrntlinc",
+        "grsalesecur": "grsalesecur",
+        "grsalesothr": "grsalesothr",
+        "cstbasisecur": "cstbasisecur",
+        "cstbasisothr": "cstbasisothr",
+        "gnlsecur": "gnlsecur",
+        "gnlsothr": "gnlsothr",
+        "netgnls": "netgnls",
+        "grsincfndrsng": "grsincfndrsng",
+        "lessdirfndrsng": "lessdirfndrsng",
+        "netincfndrsng": "netincfndrsng",
+        "grsincgaming": "grsincgaming",
+        "lessdirgaming": "lessdirgaming",
+        "netincgaming": "netincgaming",
+        "grsalesinvent": "grsalesinvent",
+        "lesscstofgoods": "lesscstofgoods",
+        "netincsales": "netincsales",
+        "miscrev11acd": "miscrev11acd",
+        "miscrevtota": "miscrevtota",
+        "miscrev11bcd": "miscrev11bcd",
+        "miscrevtot11b": "miscrevtot11b",
+        "miscrev11ccd": "miscrev11ccd",
+        "miscrevtot11c": "miscrevtot11c",
+        "miscrevtot11d": "miscrevtot11d",
+        "miscrevtot11e": "miscrevtot11e",
+        "totrevenue": "totrevenue",
+        "grntstogovt": "grntstogovt",
+        "grnsttoindiv": "grnsttoindiv",
+        "grntstofrgngovt": "grntstofrgngovt",
+        "benifitsmembrs": "benifitsmembrs",
+        "compnsatncurrofcr": "compnsatncurrofcr",
+        "compnsatnandothr": "compnsatnandothr",
+        "othrsalwages": "othrsalwages",
+        "pensionplancontrb": "pensionplancontrb",
+        "othremplyeebenef": "othremplyeebenef",
+        "payrolltx": "payrolltx",
+        "feesforsrvcmgmt": "feesforsrvcmgmt",
+        "legalfees": "legalfees",
+        "accntingfees": "accntingfees",
+        "feesforsrvclobby": "feesforsrvclobby",
+        "profndraising": "profndraising",
+        "feesforsrvcinvstmgmt": "feesforsrvcinvstmgmt",
+        "feesforsrvcothr": "feesforsrvcothr",
+        "advrtpromo": "advrtpromo",
+        "officexpns": "officexpns",
+        "infotech": "infotech",
+        "royaltsexpns": "royaltsexpns",
+        "occupancy": "occupancy",
+        "travel": "travel",
+        "travelofpublicoffcl": "travelofpublicoffcl",
+        "converconventmtng": "converconventmtng",
+        "interestamt": "interestamt",
+        "pymtoaffiliates": "pymtoaffiliates",
+        "deprcatndepletn": "deprcatndepletn",
+        "insurance": "insurance",
+        "othrexpnsa": "othrexpnsa",
+        "othrexpnsb": "othrexpnsb",
+        "othrexpnsc": "othrexpnsc",
+        "othrexpnsd": "othrexpnsd",
+        "othrexpnse": "othrexpnse",
+        "othrexpnsf": "othrexpnsf",
+        "totfuncexpns": "totfuncexpns",
+        "nonintcashend": "nonintcashend",
+        "svngstempinvend": "svngstempinvend",
+        "pldgegrntrcvblend": "pldgegrntrcvblend",
+        "accntsrcvblend": "accntsrcvblend",
+        "currfrmrcvblend": "currfrmrcvblend",
+        "rcvbldisqualend": "rcvbldisqualend",
+        "notesloansrcvblend": "notesloansrcvblend",
+        "invntriesalesend": "invntriesalesend",
+        "prepaidexpnsend": "prepaidexpnsend",
+        "lndbldgsequipend": "lndbldgsequipend",
+        "invstmntsend": "invstmntsend",
+        "invstmntsothrend": "invstmntsothrend",
+        "invstmntsprgmend": "invstmntsprgmend",
+        "intangibleassetsend": "intangibleassetsend",
+        "othrassetsend": "othrassetsend",
+        "totassetsend": "totassetsend",
+        "accntspayableend": "accntspayableend",
+        "grntspayableend": "grntspayableend",
+        "deferedrevnuend": "deferedrevnuend",
+        "txexmptbndsend": "txexmptbndsend",
+        "escrwaccntliabend": "escrwaccntliabend",
+        "paybletoffcrsend": "paybletoffcrsend",
+        "secrdmrtgsend": "secrdmrtgsend",
+        "unsecurednotesend": "unsecurednotesend",
+        "othrliabend": "othrliabend",
+        "totliabend": "totliabend",
+        "unrstrctnetasstsend": "unrstrctnetasstsend",
+        "temprstrctnetasstsend": "temprstrctnetasstsend",
+        "permrstrctnetasstsend": "permrstrctnetasstsend",
+        "capitalstktrstend": "capitalstktrstend",
+        "paidinsurplusend": "paidinsurplusend",
+        "retainedearnend": "retainedearnend",
+        "totnetassetend": "totnetassetend",
+        "totnetliabastend": "totnetliabastend",
+        "nonpfrea": "nonpfrea",
+        "totnooforgscnt": "totnooforgscnt",
+        "totsupport": "totsupport",
+        "gftgrntsrcvd170": "gftgrntsrcvd170",
+        "txrevnuelevied170": "txrevnuelevied170",
+        "srvcsval170": "srvcsval170",
+        "pubsuppsubtot170": "pubsuppsubtot170",
+        "exceeds2pct170": "exceeds2pct170",
+        "pubsupplesspct170": "pubsupplesspct170",
+        "samepubsuppsubtot170": "samepubsuppsubtot170",
+        "grsinc170": "grsinc170",
+        "netincunreltd170": "netincunreltd170",
+        "othrinc170": "othrinc170",
+        "totsupp170": "totsupp170",
+        "grsrcptsrelated170": "grsrcptsrelated170",
+        "totgftgrntrcvd509": "totgftgrntrcvd509",
+        "grsrcptsadmissn509": "grsrcptsadmissn509",
+        "grsrcptsactivities509": "grsrcptsactivities509",
+        "txrevnuelevied509": "txrevnuelevied509",
+        "srvcsval509": "srvcsval509",
+        "pubsuppsubtot509": "pubsuppsubtot509",
+        "rcvdfrmdisqualsub509": "rcvdfrmdisqualsub509",
+        "exceeds1pct509": "exceeds1pct509",
+        "subtotpub509": "subtotpub509",
+        "pubsupplesub509": "pubsupplesub509",
+        "samepubsuppsubtot509": "samepubsuppsubtot509",
+        "grsinc509": "grsinc509",
+        "unreltxincls511tx509": "unreltxincls511tx509",
+        "subtotsuppinc509": "subtotsuppinc509",
+        "netincunrelatd509": "netincunrelatd509",
+        "othrinc509": "othrinc509",
+        "totsupp509": "totsupp509",
+    }
+    df = df.rename(columns=header_names, inplace=True)
 
 
 def filter_null_rows(df):
@@ -974,6 +897,14 @@ def download_file(source_url: str, source_file: pathlib.Path):
                 f.write(chunk)
     else:
         logging.error(f"Couldn't download {source_url}: {r.text}")
+
+def convert_to_int(input: str) -> str:
+    str_val = ""
+    if input == "" or (math.isnan(input)):
+        str_val = ""
+    else:
+        str_val = str(int(round(input, 0)))
+    return str_val
 
 
 def upload_file_to_gcs(file_path: pathlib.Path, gcs_bucket: str, gcs_path: str) -> None:

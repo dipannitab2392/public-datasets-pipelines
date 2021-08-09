@@ -13,8 +13,10 @@
 # limitations under the License.
 
 
+from airflow.contrib.operators import kubernetes_pod_operator
+from airflow.contrib.operators import gcs_to_bq
 from airflow import DAG
-from airflow.contrib.operators import gcs_to_bq, kubernetes_pod_operator
+
 
 default_args = {
     "owner": "Google",
@@ -42,12 +44,12 @@ with DAG(
         image="{{ var.json.irs_990_irs_990_2014.container_registry.run_csv_transform_kub }}",
         env_vars={
             "SOURCE_URL": "https://www.irs.gov/pub/irs-soi/14eofinextract990.zip",
-            "SOURCE_FILE": "files/data.dat",
+            "SOURCE_FILE": "files/data.zip",
             "TARGET_FILE": "files/data_output.csv",
             "TARGET_GCS_BUCKET": "{{ var.json.shared.composer_bucket }}",
             "TARGET_GCS_PATH": "data/irs_990/irs_990_2014/data_output.csv",
         },
-        resources={"request_memory": "4G", "request_cpu": "1"},
+        resources={"request_memory": "2G", "request_cpu": "1"},
     )
 
     # Task to load CSV data to a BigQuery table

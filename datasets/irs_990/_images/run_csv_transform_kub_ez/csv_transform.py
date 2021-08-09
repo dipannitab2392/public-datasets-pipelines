@@ -77,10 +77,10 @@ def main(
 
     if os.path.basename(urlparse(source_url).path) == "14eofinextract990ez.zip":
         df = pd.read_csv(
-            str(source_file), compression="zip", encoding="utf-8", sep="\s+"
+            str(source_file), compression="zip", encoding="utf-8", sep=r"\s+"
         )
     else:
-        df = pd.read_csv(str(source_file), encoding="utf-8", sep="\s+")
+        df = pd.read_csv(str(source_file), encoding="utf-8", sep=r"\s+")
 
     # steps in the pipeline
     logging.info(f"Transforming.. {source_file}")

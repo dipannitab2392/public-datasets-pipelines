@@ -24,7 +24,7 @@ default_args = {
 
 
 with DAG(
-    dag_id="irs_990.irs_990_pf_2015",
+    dag_id="irs_990.irs_990_pf_2014",
     default_args=default_args,
     max_active_runs=1,
     schedule_interval="@daily",
@@ -33,30 +33,30 @@ with DAG(
 ) as dag:
 
     # Run CSV transform within kubernetes pod
-    irs_990_pf_2015_transform_csv = kubernetes_pod_operator.KubernetesPodOperator(
-        task_id="irs_990_pf_2015_transform_csv",
+    irs_990_pf_2014_transform_csv = kubernetes_pod_operator.KubernetesPodOperator(
+        task_id="irs_990_pf_2014_transform_csv",
         startup_timeout_seconds=600,
-        name="irs_990_pf_2015",
+        name="irs_990_pf_2014",
         namespace="default",
         image_pull_policy="Always",
-        image="{{ var.json.irs_990_irs_990_pf_2015.container_registry.run_csv_transform_kub_pf }}",
+        image="{{ var.json.irs_990_irs_990_pf_2014.container_registry.run_csv_transform_kub_pf }}",
         env_vars={
-            "SOURCE_URL": "https://www.irs.gov/pub/irs-soi/15eofinextract990pf.dat",
-            "SOURCE_FILE": "files/data.dat",
+            "SOURCE_URL": "https://www.irs.gov/pub/irs-soi/14eofinextract990pf.zip",
+            "SOURCE_FILE": "files/data.zip",
             "TARGET_FILE": "files/data_output.csv",
             "TARGET_GCS_BUCKET": "{{ var.json.shared.composer_bucket }}",
-            "TARGET_GCS_PATH": "data/irs_990/irs_990_pf_2015/data_output.csv",
+            "TARGET_GCS_PATH": "data/irs_990/irs_990_pf_2014/data_output.csv",
         },
-        resources={"request_memory": "2G", "request_cpu": "1"},
+        resources={"request_memory": "4G", "request_cpu": "1"},
     )
 
     # Task to load CSV data to a BigQuery table
-    load_irs_990_pf_2015_to_bq = gcs_to_bq.GoogleCloudStorageToBigQueryOperator(
-        task_id="load_irs_990_pf_2015_to_bq",
+    load_irs_990_pf_2014_to_bq = gcs_to_bq.GoogleCloudStorageToBigQueryOperator(
+        task_id="load_irs_990_pf_2014_to_bq",
         bucket="{{ var.json.shared.composer_bucket }}",
-        source_objects=["data/irs_990/irs_990_pf_2015/data_output.csv"],
+        source_objects=["data/irs_990/irs_990_pf_2014/data_output.csv"],
         source_format="CSV",
-        destination_project_dataset_table="irs_990.irs_990_pf_2015",
+        destination_project_dataset_table="irs_990.irs_990_pf_2014",
         skip_leading_rows=1,
         write_disposition="WRITE_TRUNCATE",
         schema_fields=[
@@ -65,12 +65,6 @@ with DAG(
                 "type": "string",
                 "description": "Employer Identification Number",
                 "mode": "required",
-            },
-            {
-                "name": "elf",
-                "type": "string",
-                "description": "E-file indicator",
-                "mode": "nullable",
             },
             {
                 "name": "tax_prd",
@@ -535,7 +529,7 @@ with DAG(
                 "mode": "nullable",
             },
             {
-                "name": "distribdafcd",
+                "name": "acqdrindrintcd",
                 "type": "string",
                 "description": "Distribution to donor advised fund with advisory privileges?",
                 "mode": "nullable",
@@ -1137,4 +1131,4 @@ with DAG(
         ],
     )
 
-    irs_990_pf_2015_transform_csv >> load_irs_990_pf_2015_to_bq
+    irs_990_pf_2014_transform_csv >> load_irs_990_pf_2014_to_bq
