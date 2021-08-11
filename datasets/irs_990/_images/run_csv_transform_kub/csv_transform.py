@@ -96,7 +96,7 @@ def main(
 
     logging.info("Transform: Converting to integr.. ")
 
-    df["totsupp509"] =  df["totsupp509"].apply(convert_to_int)
+    df["totsupp509"] = df["totsupp509"].apply(convert_to_int)
 
     logging.info(
         f"Transform: Reordering headers for.. {os.path.basename(urlparse(source_url).path)}"
@@ -897,6 +897,7 @@ def download_file(source_url: str, source_file: pathlib.Path):
                 f.write(chunk)
     else:
         logging.error(f"Couldn't download {source_url}: {r.text}")
+
 
 def convert_to_int(input: str) -> str:
     str_val = ""
