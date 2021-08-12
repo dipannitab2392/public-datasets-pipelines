@@ -12,46 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# CSV transform for: irs_990.irs_990_2015
-#
-#       Column Name                         Type            Length / Format                 Description
-#
-#       ID                                  integer         255                             ""
-#       Case Number                         string          255                             ""
-#       Date                                date          255                             ""
-#       Block                               string          512                             ""
-#       IUCR                                string          255                             ""
-#       Primary Type                        integer         255                             ""
-#       Description                         string          11/23/2020 01:41:21 PM          ""
-#       Location Description                integer         11/23/2020 01:41:21 PM          ""
-#       Arrest                              string          11/23/2020 01:41:21 PM          ""
-#       Domestic                            integer         11/23/2020 01:41:21 PM          ""
-#       Beat                                float           255                             ""
-#       District                            string          255                             ""
-#       Ward                                integer         255                             ""
-#       Community Area                      datetime        255                             ""
-#       FBI Code                            datetime        255                             ""
-#       X Coordinate                        datetime        255                             ""
-#       Y Coordinate                        datetime        255                             ""
-#       Year                                datetime        255                             ""
-#       Updated On                          datetime        255                             ""
-#       Latitude                            datetime        255                             ""
-#       Longitude                           datetime        255                             ""
-#       Location                            datetime        255                             ""
-
 
 import datetime
+import fnmatch
 import logging
 import os
 import pathlib
-from zipfile import ZipFile, Path
-import fnmatch
+from zipfile import ZipFile
 
 import pandas as pd
 
 # import numpy as np
 import requests
 from google.cloud import storage
+
 
 def main(
     source_url: str,
@@ -74,7 +48,7 @@ def main(
     download_file(source_url, source_file)
 
     logging.info(f"Opening file {source_file}")
-    df = read_csv_file(source_file,source_csv_name)
+    df = read_csv_file(source_file, source_csv_name)
 
     logging.info(f"Transforming.. {source_file}")
 
@@ -84,23 +58,23 @@ def main(
     logging.info("Transform: Reordering headers.. ")
     df = df[
         [
-           'advertiser_id', 
-           'advertiser_name',
-           'election_cycle',
-           'week_start_date',
-           'spend_usd',
-           'spend_eur',
-           'spend_inr',
-           'spend_bgn',
-           'spend_hrk',
-           'spend_czk',
-           'spend_dkk',
-           'spend_huf',
-           'spend_pln',
-           'spend_ron',
-           'spend_sek',
-           'spend_gbp',
-           'spend_nzd'
+            "advertiser_id",
+            "advertiser_name",
+            "election_cycle",
+            "week_start_date",
+            "spend_usd",
+            "spend_eur",
+            "spend_inr",
+            "spend_bgn",
+            "spend_hrk",
+            "spend_czk",
+            "spend_dkk",
+            "spend_huf",
+            "spend_pln",
+            "spend_ron",
+            "spend_sek",
+            "spend_gbp",
+            "spend_nzd",
         ]
     ]
 
@@ -120,7 +94,6 @@ def main(
         "Google Political Ads process completed at "
         + str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     )
-
 
 
 def save_to_new_file(df, file_path):
@@ -144,36 +117,38 @@ def download_file(source_url: str, source_file: pathlib.Path):
     else:
         logging.error(f"Couldn't download {source_url}: {r.text}")
 
-def read_csv_file (source_file,source_csv_name) : 
+
+def read_csv_file(source_file, source_csv_name):
     with ZipFile(source_file) as zipfiles:
         file_list = zipfiles.namelist()
         csv_files = fnmatch.filter(file_list, source_csv_name)
         data = [pd.read_csv(zipfiles.open(file_name)) for file_name in csv_files]
-    
+
     df = pd.concat(data)
     return df
 
-def rename_headers(df) : 
+
+def rename_headers(df):
     header_names = {
-        'Advertiser_ID' : 'advertiser_id' ,
-        'Advertiser_Name' : 'advertiser_name' ,
-        'Election_Cycle' : 'election_cycle' ,
-        'Week_Start_Date' : 'week_start_date' ,
-        'Spend_USD' : 'spend_usd' ,
-        'Spend_EUR' : 'spend_eur' ,
-        'Spend_INR' : 'spend_inr' ,
-        'Spend_BGN' : 'spend_bgn' ,
-        'Spend_HRK' : 'spend_hrk' ,
-        'Spend_CZK' : 'spend_czk' ,
-        'Spend_DKK' : 'spend_dkk' ,
-        'Spend_HUF' : 'spend_huf' ,
-        'Spend_PLN' : 'spend_pln' ,
-        'Spend_RON' : 'spend_ron' ,
-        'Spend_SEK' : 'spend_sek' ,
-        'Spend_GBP' : 'spend_gbp' ,
-        'Spend_NZD' : 'spend_nzd' 
+        "Advertiser_ID": "advertiser_id",
+        "Advertiser_Name": "advertiser_name",
+        "Election_Cycle": "election_cycle",
+        "Week_Start_Date": "week_start_date",
+        "Spend_USD": "spend_usd",
+        "Spend_EUR": "spend_eur",
+        "Spend_INR": "spend_inr",
+        "Spend_BGN": "spend_bgn",
+        "Spend_HRK": "spend_hrk",
+        "Spend_CZK": "spend_czk",
+        "Spend_DKK": "spend_dkk",
+        "Spend_HUF": "spend_huf",
+        "Spend_PLN": "spend_pln",
+        "Spend_RON": "spend_ron",
+        "Spend_SEK": "spend_sek",
+        "Spend_GBP": "spend_gbp",
+        "Spend_NZD": "spend_nzd",
     }
-    df.rename(columns=header_names,inplace=True)
+    df.rename(columns=header_names, inplace=True)
 
 
 if __name__ == "__main__":
@@ -182,7 +157,7 @@ if __name__ == "__main__":
     main(
         source_url=os.environ["SOURCE_URL"],
         source_file=pathlib.Path(os.environ["SOURCE_FILE"]).expanduser(),
-        source_csv_name = os.environ["FILE_NAME"],
+        source_csv_name=os.environ["FILE_NAME"],
         target_file=pathlib.Path(os.environ["TARGET_FILE"]).expanduser(),
         target_gcs_bucket=os.environ["TARGET_GCS_BUCKET"],
         target_gcs_path=os.environ["TARGET_GCS_PATH"],

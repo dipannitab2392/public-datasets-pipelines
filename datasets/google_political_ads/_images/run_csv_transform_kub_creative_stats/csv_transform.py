@@ -12,46 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# CSV transform for: irs_990.irs_990_2015
-#
-#       Column Name                         Type            Length / Format                 Description
-#
-#       ID                                  integer         255                             ""
-#       Case Number                         string          255                             ""
-#       Date                                date          255                             ""
-#       Block                               string          512                             ""
-#       IUCR                                string          255                             ""
-#       Primary Type                        integer         255                             ""
-#       Description                         string          11/23/2020 01:41:21 PM          ""
-#       Location Description                integer         11/23/2020 01:41:21 PM          ""
-#       Arrest                              string          11/23/2020 01:41:21 PM          ""
-#       Domestic                            integer         11/23/2020 01:41:21 PM          ""
-#       Beat                                float           255                             ""
-#       District                            string          255                             ""
-#       Ward                                integer         255                             ""
-#       Community Area                      datetime        255                             ""
-#       FBI Code                            datetime        255                             ""
-#       X Coordinate                        datetime        255                             ""
-#       Y Coordinate                        datetime        255                             ""
-#       Year                                datetime        255                             ""
-#       Updated On                          datetime        255                             ""
-#       Latitude                            datetime        255                             ""
-#       Longitude                           datetime        255                             ""
-#       Location                            datetime        255                             ""
-
 
 import datetime
+import fnmatch
 import logging
 import os
 import pathlib
-from zipfile import ZipFile, Path
-import fnmatch
+from zipfile import ZipFile
 
 import pandas as pd
 
 # import numpy as np
 import requests
 from google.cloud import storage
+
 
 def main(
     source_url: str,
@@ -74,7 +48,7 @@ def main(
     download_file(source_url, source_file)
 
     logging.info(f"Opening file {source_file}")
-    df = read_csv_file(source_file,source_csv_name)
+    df = read_csv_file(source_file, source_csv_name)
 
     logging.info(f"Transforming.. {source_file}")
 
@@ -84,51 +58,50 @@ def main(
     logging.info("Transform: Reordering headers.. ")
     df = df[
         [
-           'ad_id', 
-           'ad_url', 
-           'ad_type', 
-           'regions', 
-           'advertiser_id', 
-           'advertiser_name', 
-           'ad_campaigns_list', 
-           'date_range_start', 
-           'date_range_end', 
-           'num_of_days', 
-           'impressions', 
-           'spend_usd', 
-           'first_served_timestamp', 
-           'last_served_timestamp', 
-           'age_targeting', 
-           'gender_targeting', 
-           'geo_targeting_included', 
-           'geo_targeting_excluded', 
-           'spend_range_min_usd', 
-           'spend_range_max_usd', 
-           'spend_range_min_eur', 
-           'spend_range_max_eur', 
-           'spend_range_min_inr', 
-           'spend_range_max_inr', 
-           'spend_range_min_bgn', 
-           'spend_range_max_bgn', 
-           'spend_range_min_hrk', 
-           'spend_range_max_hrk', 
-           'spend_range_min_czk', 
-           'spend_range_max_czk', 
-           'spend_range_min_dkk', 
-           'spend_range_max_dkk', 
-           'spend_range_min_huf', 
-           'spend_range_max_huf', 
-           'spend_range_min_pln', 
-           'spend_range_max_pln', 
-           'spend_range_min_ron', 
-           'spend_range_max_ron', 
-           'spend_range_min_sek', 
-           'spend_range_max_sek', 
-           'spend_range_min_gbp', 
-           'spend_range_max_gbp', 
-           'spend_range_min_nzd', 
-           'spend_range_max_nzd'
-           
+            "ad_id",
+            "ad_url",
+            "ad_type",
+            "regions",
+            "advertiser_id",
+            "advertiser_name",
+            "ad_campaigns_list",
+            "date_range_start",
+            "date_range_end",
+            "num_of_days",
+            "impressions",
+            "spend_usd",
+            "first_served_timestamp",
+            "last_served_timestamp",
+            "age_targeting",
+            "gender_targeting",
+            "geo_targeting_included",
+            "geo_targeting_excluded",
+            "spend_range_min_usd",
+            "spend_range_max_usd",
+            "spend_range_min_eur",
+            "spend_range_max_eur",
+            "spend_range_min_inr",
+            "spend_range_max_inr",
+            "spend_range_min_bgn",
+            "spend_range_max_bgn",
+            "spend_range_min_hrk",
+            "spend_range_max_hrk",
+            "spend_range_min_czk",
+            "spend_range_max_czk",
+            "spend_range_min_dkk",
+            "spend_range_max_dkk",
+            "spend_range_min_huf",
+            "spend_range_max_huf",
+            "spend_range_min_pln",
+            "spend_range_max_pln",
+            "spend_range_min_ron",
+            "spend_range_max_ron",
+            "spend_range_min_sek",
+            "spend_range_max_sek",
+            "spend_range_min_gbp",
+            "spend_range_max_gbp",
+            "spend_range_min_nzd",
+            "spend_range_max_nzd",
         ]
     ]
 
@@ -148,7 +121,6 @@ def main(
         "Google Political Ads process completed at "
         + str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     )
-
 
 
 def save_to_new_file(df, file_path):
@@ -172,63 +144,65 @@ def download_file(source_url: str, source_file: pathlib.Path):
     else:
         logging.error(f"Couldn't download {source_url}: {r.text}")
 
-def read_csv_file (source_file,source_csv_name) : 
+
+def read_csv_file(source_file, source_csv_name):
     with ZipFile(source_file) as zipfiles:
         file_list = zipfiles.namelist()
         csv_files = fnmatch.filter(file_list, source_csv_name)
         data = [pd.read_csv(zipfiles.open(file_name)) for file_name in csv_files]
-    
+
     df = pd.concat(data)
     return df
 
-def rename_headers(df) : 
+
+def rename_headers(df):
     header_names = {
-        'Ad_ID' : 'ad_id' ,
-        'Ad_URL' : 'ad_url' ,
-        'Ad_Type' : 'ad_type' ,
-        'Regions' : 'regions' ,
-        'Advertiser_ID' : 'advertiser_id' ,
-        'Advertiser_Name' : 'advertiser_name' ,
-        'Ad_Campaigns_List' : 'ad_campaigns_list' ,
-        'Date_Range_Start' : 'date_range_start' ,
-        'Date_Range_End' : 'date_range_end' ,
-        'Num_of_Days' : 'num_of_days' ,
-        'Impressions' : 'impressions' ,
-        'Spend_USD' : 'spend_usd' ,
-        'Spend_Range_Min_USD' : 'spend_range_min_usd' ,
-        'Spend_Range_Max_USD' : 'spend_range_max_usd' ,
-        'Spend_Range_Min_EUR' : 'spend_range_min_eur' ,
-        'Spend_Range_Max_EUR' : 'spend_range_max_eur' ,
-        'Spend_Range_Min_INR' : 'spend_range_min_inr' ,
-        'Spend_Range_Max_INR' : 'spend_range_max_inr' ,
-        'Spend_Range_Min_BGN' : 'spend_range_min_bgn' ,
-        'Spend_Range_Max_BGN' : 'spend_range_max_bgn' ,
-        'Spend_Range_Min_HRK' : 'spend_range_min_hrk' ,
-        'Spend_Range_Max_HRK' : 'spend_range_max_hrk' ,
-        'Spend_Range_Min_CZK' : 'spend_range_min_czk' ,
-        'Spend_Range_Max_CZK' : 'spend_range_max_czk' ,
-        'Spend_Range_Min_DKK' : 'spend_range_min_dkk' ,
-        'Spend_Range_Max_DKK' : 'spend_range_max_dkk' ,
-        'Spend_Range_Min_HUF' : 'spend_range_min_huf' ,
-        'Spend_Range_Max_HUF' : 'spend_range_max_huf' ,
-        'Spend_Range_Min_PLN' : 'spend_range_min_pln' ,
-        'Spend_Range_Max_PLN' : 'spend_range_max_pln' ,
-        'Spend_Range_Min_RON' : 'spend_range_min_ron' ,
-        'Spend_Range_Max_RON' : 'spend_range_max_ron' ,
-        'Spend_Range_Min_SEK' : 'spend_range_min_sek' ,
-        'Spend_Range_Max_SEK' : 'spend_range_max_sek' ,
-        'Spend_Range_Min_GBP' : 'spend_range_min_gbp' ,
-        'Spend_Range_Max_GBP' : 'spend_range_max_gbp' ,
-        'Spend_Range_Min_NZD' : 'spend_range_min_nzd' ,
-        'Spend_Range_Max_NZD' : 'spend_range_max_nzd' ,
-        'Age_Targeting' : 'age_targeting' ,
-        'Gender_Targeting' : 'gender_targeting' ,
-        'Geo_Targeting_Included' : 'geo_targeting_included' ,
-        'Geo_Targeting_Excluded' : 'geo_targeting_excluded' ,
-        'First_Served_Timestamp' : 'first_served_timestamp' ,
-        'Last_Served_Timestamp' : 'last_served_timestamp'         
+        "Ad_ID": "ad_id",
+        "Ad_URL": "ad_url",
+        "Ad_Type": "ad_type",
+        "Regions": "regions",
+        "Advertiser_ID": "advertiser_id",
+        "Advertiser_Name": "advertiser_name",
+        "Ad_Campaigns_List": "ad_campaigns_list",
+        "Date_Range_Start": "date_range_start",
+        "Date_Range_End": "date_range_end",
+        "Num_of_Days": "num_of_days",
+        "Impressions": "impressions",
+        "Spend_USD": "spend_usd",
+        "Spend_Range_Min_USD": "spend_range_min_usd",
+        "Spend_Range_Max_USD": "spend_range_max_usd",
+        "Spend_Range_Min_EUR": "spend_range_min_eur",
+        "Spend_Range_Max_EUR": "spend_range_max_eur",
+        "Spend_Range_Min_INR": "spend_range_min_inr",
+        "Spend_Range_Max_INR": "spend_range_max_inr",
+        "Spend_Range_Min_BGN": "spend_range_min_bgn",
+        "Spend_Range_Max_BGN": "spend_range_max_bgn",
+        "Spend_Range_Min_HRK": "spend_range_min_hrk",
+        "Spend_Range_Max_HRK": "spend_range_max_hrk",
+        "Spend_Range_Min_CZK": "spend_range_min_czk",
+        "Spend_Range_Max_CZK": "spend_range_max_czk",
+        "Spend_Range_Min_DKK": "spend_range_min_dkk",
+        "Spend_Range_Max_DKK": "spend_range_max_dkk",
+        "Spend_Range_Min_HUF": "spend_range_min_huf",
+        "Spend_Range_Max_HUF": "spend_range_max_huf",
+        "Spend_Range_Min_PLN": "spend_range_min_pln",
+        "Spend_Range_Max_PLN": "spend_range_max_pln",
+        "Spend_Range_Min_RON": "spend_range_min_ron",
+        "Spend_Range_Max_RON": "spend_range_max_ron",
+        "Spend_Range_Min_SEK": "spend_range_min_sek",
+        "Spend_Range_Max_SEK": "spend_range_max_sek",
+        "Spend_Range_Min_GBP": "spend_range_min_gbp",
+        "Spend_Range_Max_GBP": "spend_range_max_gbp",
+        "Spend_Range_Min_NZD": "spend_range_min_nzd",
+        "Spend_Range_Max_NZD": "spend_range_max_nzd",
+        "Age_Targeting": "age_targeting",
+        "Gender_Targeting": "gender_targeting",
+        "Geo_Targeting_Included": "geo_targeting_included",
+        "Geo_Targeting_Excluded": "geo_targeting_excluded",
+        "First_Served_Timestamp": "first_served_timestamp",
+        "Last_Served_Timestamp": "last_served_timestamp",
     }
-    df.rename(columns=header_names,inplace=True)
+    df.rename(columns=header_names, inplace=True)
 
 
 if __name__ == "__main__":
@@ -237,7 +211,7 @@ if __name__ == "__main__":
     main(
         source_url=os.environ["SOURCE_URL"],
         source_file=pathlib.Path(os.environ["SOURCE_FILE"]).expanduser(),
-        source_csv_name = os.environ["FILE_NAME"],
+        source_csv_name=os.environ["FILE_NAME"],
         target_file=pathlib.Path(os.environ["TARGET_FILE"]).expanduser(),
         target_gcs_bucket=os.environ["TARGET_GCS_BUCKET"],
         target_gcs_path=os.environ["TARGET_GCS_PATH"],
