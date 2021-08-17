@@ -23,6 +23,7 @@ resources:
     description: "advertiser_weekly_spend dataset"
 
 dag:
+  airflow_version: 1
   initialize:
     dag_id: advertiser_weekly_spend
     default_args:
@@ -57,7 +58,7 @@ dag:
         image_pull_policy: "Always"
 
         # Docker images will be built and pushed to GCR by default whenever the `scripts/generate_dag.py` is run. To skip building and pushing images, use the optional `--skip-builds` flag.
-        image: "{{ var.json.google_political_ads.container_registry.run_csv_transform_kub_advertiser_weekly_spend }}"
+        image: "{{ var.json.google_political_ads.container_registry.run_csv_transform_kub }}"
 
         # Set the environment variables you need initialized in the container. Use these as input variables for the script your container is expected to perform.
         env_vars:
@@ -67,6 +68,11 @@ dag:
           TARGET_FILE: "files/data_output.csv"
           TARGET_GCS_BUCKET: "{{ var.json.shared.composer_bucket }}"
           TARGET_GCS_PATH: "data/google_political_ads/advertiser_weekly_spend/data_output.csv"
+          PIPELINE_NAME: "advertiser_weekly_spend"
+          CSV_HEADERS: >-
+            ["advertiser_id","advertiser_name","election_cycle","week_start_date","spend_usd","spend_eur","spend_inr","spend_bgn","spend_hrk","spend_czk","spend_dkk","spend_huf","spend_pln","spend_ron","spend_sek","spend_gbp","spend_nzd"]
+          RENAME_MAPPINGS: >- 
+            {"Advertiser_ID": "advertiser_id","Advertiser_Name": "advertiser_name","Election_Cycle": "election_cycle","Week_Start_Date": "week_start_date","Spend_USD": "spend_usd","Spend_EUR": "spend_eur","Spend_INR": "spend_inr","Spend_BGN": "spend_bgn","Spend_HRK": "spend_hrk","Spend_CZK": "spend_czk","Spend_DKK": "spend_dkk","Spend_HUF": "spend_huf","Spend_PLN": "spend_pln","Spend_RON": "spend_ron","Spend_SEK": "spend_sek","Spend_GBP": "spend_gbp","Spend_NZD": "spend_nzd"}
 
         # Set resource limits for the pod here. For resource units in Kubernetes, see https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#resource-units-in-kubernetes
         resources:

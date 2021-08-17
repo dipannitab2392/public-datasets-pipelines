@@ -15,9 +15,11 @@
 
 import datetime
 import fnmatch
+import json
 import logging
 import os
 import pathlib
+import typing
 from zipfile import ZipFile
 
 import pandas as pd
@@ -34,10 +36,13 @@ def main(
     target_file: pathlib.Path,
     target_gcs_bucket: str,
     target_gcs_path: str,
+    headers: typing.List[str],
+    rename_mappings: dict,
+    pipeline_name: str
 ):
 
     logging.info(
-        "google political ads process started at "
+        f"google political ads {pipeline_name} process started at "
         + str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     )
 
@@ -52,33 +57,11 @@ def main(
 
     logging.info(f"Transforming.. {source_file}")
 
-    logging.info(f"Transform: Rename columns.. {source_file}")
-    rename_headers(df)
+    logging.info(f"Transform: Rename columns for {pipeline_name}..")
+    rename_headers(df, rename_mappings)
 
-    logging.info("Transform: Reordering headers.. ")
-    df = df[
-        [
-            "advertiser_id",
-            "advertiser_name",
-            "public_ids_list",
-            "regions",
-            "elections",
-            "total_creatives",
-            "spend_usd",
-            "spend_eur",
-            "spend_inr",
-            "spend_bgn",
-            "spend_hrk",
-            "spend_czk",
-            "spend_dkk",
-            "spend_huf",
-            "spend_pln",
-            "spend_ron",
-            "spend_sek",
-            "spend_gbp",
-            "spend_nzd",
-        ]
-    ]
+    logging.info(f"Transform: Reordering headers for {pipeline_name}.. ")
+    df = df[headers]
 
     logging.info(f"Saving to output file.. {target_file}")
     try:
@@ -93,7 +76,7 @@ def main(
     upload_file_to_gcs(target_file, target_gcs_bucket, target_gcs_path)
 
     logging.info(
-        "Google Political Ads process completed at "
+        f"Google Political Ads {pipeline_name} process completed at "
         + str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     )
 
@@ -130,29 +113,8 @@ def read_csv_file(source_file, source_csv_name):
     return df
 
 
-def rename_headers(df):
-    header_names = {
-        "Advertiser_ID": "advertiser_id",
-        "Advertiser_Name": "advertiser_name",
-        "Public_IDs_List": "public_ids_list",
-        "Regions": "regions",
-        "Elections": "elections",
-        "Total_Creatives": "total_creatives",
-        "Spend_USD": "spend_usd",
-        "Spend_EUR": "spend_eur",
-        "Spend_INR": "spend_inr",
-        "Spend_BGN": "spend_bgn",
-        "Spend_HRK": "spend_hrk",
-        "Spend_CZK": "spend_czk",
-        "Spend_DKK": "spend_dkk",
-        "Spend_HUF": "spend_huf",
-        "Spend_PLN": "spend_pln",
-        "Spend_RON": "spend_ron",
-        "Spend_SEK": "spend_sek",
-        "Spend_GBP": "spend_gbp",
-        "Spend_NZD": "spend_nzd",
-    }
-    df.rename(columns=header_names, inplace=True)
+def rename_headers(df, rename_mappings: dict):
+    df.rename(columns=rename_mappings, inplace=True)
 
 
 if __name__ == "__main__":
@@ -165,4 +127,7 @@ if __name__ == "__main__":
         target_file=pathlib.Path(os.environ["TARGET_FILE"]).expanduser(),
         target_gcs_bucket=os.environ["TARGET_GCS_BUCKET"],
         target_gcs_path=os.environ["TARGET_GCS_PATH"],
+        headers=json.loads(os.environ["CSV_HEADERS"]),
+        rename_mappings=json.loads(os.environ["RENAME_MAPPINGS"]),
+        pipeline_name=os.environ["PIPELINE_NAME"]
     )
