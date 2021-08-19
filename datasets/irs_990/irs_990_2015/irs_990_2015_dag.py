@@ -39,7 +39,7 @@ with DAG(
         name="irs_990_2015",
         namespace="default",
         image_pull_policy="Always",
-        image="{{ var.json.irs_990_irs_990_2015.container_registry.run_csv_transform_kub }}",
+        image="{{ var.json.irs_990.container_registry.run_csv_transform_kub }}",
         env_vars={
             "SOURCE_URL": "https://www.irs.gov/pub/irs-soi/15eofinextract990.dat.dat",
             "SOURCE_FILE": "files/data.dat",

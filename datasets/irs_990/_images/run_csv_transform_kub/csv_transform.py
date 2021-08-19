@@ -19,6 +19,7 @@ import logging
 import math
 import os
 import pathlib
+import re
 import typing
 from urllib.parse import urlparse
 
@@ -37,7 +38,7 @@ def main(
     target_gcs_path: str,
     headers: typing.List[str],
     rename_mappings: dict,
-    pipeline_name: str
+    pipeline_name: str,
 ):
 
     logging.info(
@@ -54,7 +55,9 @@ def main(
     # open the input file
     logging.info(f"Opening file {source_file}... ")
 
-    if os.path.basename(urlparse(source_url).path) == "14eofinextract990.zip" or os.path.basename(urlparse(source_url).path) == "14eofinextract990ez.zip":
+    str_value = os.path.basename(urlparse(source_url).path)
+
+    if re.search("zip", str_value):
         df = pd.read_csv(
             str(source_file), compression="zip", encoding="utf-8", sep=r"\s+"
         )
@@ -66,15 +69,25 @@ def main(
 
     logging.info(f"Transform: Rename columns.. {source_file}")
 
-    rename_headers(df,rename_mappings)
+    rename_headers(df, rename_mappings)
 
     logging.info(f"Transform: filtering null values.. {source_file}")
 
     filter_null_rows(df)
 
-    logging.info("Transform: Converting to integr.. ")
+    # logging.info("Transform: Converting to integr.. ")
 
-    df["totsupp509"] = df["totsupp509"].apply(convert_to_int)
+    # df["totsupp509"] = df["totsupp509"].apply(convert_to_int)
+
+    logging.info(f"Transform: converting to integer.. {source_file}")
+
+    if re.search("pf", pipeline_name):
+        df.invstexcisetx = df.invstexcisetx.replace("N", 0)
+        df.crelamt = df.crelamt.replace("N", 0)
+        df.dvdndsinte = df.dvdndsinte.replace("N", 0)
+        df.intrstrvnue = df.intrstrvnue.replace("N", 0)
+    else:
+        df["totsupp509"] = df["totsupp509"].apply(convert_to_int)
 
     logging.info(
         f"Transform: Reordering headers for.. {os.path.basename(urlparse(source_url).path)}"
@@ -101,7 +114,7 @@ def main(
     )
 
 
-def rename_headers(df,rename_mappings):
+def rename_headers(df, rename_mappings):
     df = df.rename(columns=rename_mappings, inplace=True)
 
 
@@ -152,5 +165,5 @@ if __name__ == "__main__":
         target_gcs_path=os.environ["TARGET_GCS_PATH"],
         headers=json.loads(os.environ["CSV_HEADERS"]),
         rename_mappings=json.loads(os.environ["RENAME_MAPPINGS"]),
-        pipeline_name=os.environ["PIPELINE_NAME"]
+        pipeline_name=os.environ["PIPELINE_NAME"],
     )
