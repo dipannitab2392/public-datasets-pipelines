@@ -17,6 +17,7 @@ import datetime
 import fnmatch
 import json
 import logging
+import math
 import os
 import pathlib
 import typing
@@ -38,7 +39,7 @@ def main(
     target_gcs_path: str,
     headers: typing.List[str],
     rename_mappings: dict,
-    pipeline_name: str
+    pipeline_name: str,
 ):
 
     logging.info(
@@ -59,6 +60,24 @@ def main(
 
     logging.info(f"Transform: Rename columns for {pipeline_name}..")
     rename_headers(df, rename_mappings)
+
+    if pipeline_name == "creative_stats":
+        logging.info(f"Transform: converting to integer for {pipeline_name}..")
+        df["spend_range_max_usd"] = df["spend_range_max_usd"].apply(convert_to_int)
+        df["spend_range_max_eur"] = df["spend_range_max_eur"].apply(convert_to_int)
+        df["spend_range_max_inr"] = df["spend_range_max_inr"].apply(convert_to_int)
+        df["spend_range_max_bgn"] = df["spend_range_max_bgn"].apply(convert_to_int)
+        df["spend_range_max_hrk"] = df["spend_range_max_hrk"].apply(convert_to_int)
+        df["spend_range_max_czk"] = df["spend_range_max_czk"].apply(convert_to_int)
+        df["spend_range_max_dkk"] = df["spend_range_max_dkk"].apply(convert_to_int)
+        df["spend_range_max_huf"] = df["spend_range_max_huf"].apply(convert_to_int)
+        df["spend_range_max_pln"] = df["spend_range_max_pln"].apply(convert_to_int)
+        df["spend_range_max_ron"] = df["spend_range_max_ron"].apply(convert_to_int)
+        df["spend_range_max_gbp"] = df["spend_range_max_gbp"].apply(convert_to_int)
+        df["spend_range_max_sek"] = df["spend_range_max_sek"].apply(convert_to_int)
+        df["spend_range_max_nzd"] = df["spend_range_max_nzd"].apply(convert_to_int)
+    else:
+        df = df
 
     logging.info(f"Transform: Reordering headers for {pipeline_name}.. ")
     df = df[headers]
@@ -117,6 +136,15 @@ def rename_headers(df, rename_mappings: dict):
     df.rename(columns=rename_mappings, inplace=True)
 
 
+def convert_to_int(input: str) -> str:
+    str_val = ""
+    if input == "" or (math.isnan(input)):
+        str_val = ""
+    else:
+        str_val = str(int(round(input, 0)))
+    return str_val
+
+
 if __name__ == "__main__":
     logging.getLogger().setLevel(logging.INFO)
 
@@ -129,5 +157,5 @@ if __name__ == "__main__":
         target_gcs_path=os.environ["TARGET_GCS_PATH"],
         headers=json.loads(os.environ["CSV_HEADERS"]),
         rename_mappings=json.loads(os.environ["RENAME_MAPPINGS"]),
-        pipeline_name=os.environ["PIPELINE_NAME"]
+        pipeline_name=os.environ["PIPELINE_NAME"],
     )
