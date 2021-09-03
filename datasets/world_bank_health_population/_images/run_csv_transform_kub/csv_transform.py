@@ -16,6 +16,7 @@
 import datetime
 import json
 import logging
+import math
 import os
 import pathlib
 import subprocess
@@ -68,6 +69,11 @@ def main(
     if pipeline_name == 'country_summary' :
         logging.info(f"Transform: Creating a new column ...")
         df['latest_water_withdrawal_data'] = ''
+
+        logging.info(f"Transform: converting to integer ... ")
+        df["latest_industrial_data"] = df["latest_industrial_data"].apply(convert_to_integer_string)
+        df["latest_trade_data"] = df["latest_trade_data"].apply(convert_to_integer_string)
+
     else :
         df = df
 
@@ -94,8 +100,7 @@ def main(
 
 
 def download_file(source_url, source_file) :
-    subprocess.call('gsutil cp "{}" "{}"'.format(source_url,source_file), shell=True)
-    # os.system(f'gsutil cp {source_url} {source_file}')
+    subprocess.check_call(["gsutil", "cp", f"{source_url}", f"{source_file}"])
 
 def rename_headers(df: pd.DataFrame, rename_mappings: dict) -> None:
     df.rename(columns=rename_mappings, inplace=True)
@@ -109,6 +114,14 @@ def extract_year(string_val : str ) :
 
 def save_to_new_file(df: pd.DataFrame, file_path: str) -> None:
     df.to_csv(file_path, index=False)
+
+def convert_to_integer_string(input: typing.Union[str, float]) -> str:
+    str_val = ""
+    if not input or (math.isnan(input)):
+        str_val = ""
+    else:
+        str_val = str(int(round(input, 0)))
+    return str_val
 
 
 def upload_file_to_gcs(file_path: pathlib.Path, gcs_bucket: str, gcs_path: str) -> None:

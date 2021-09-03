@@ -64,7 +64,7 @@ dag:
         env_vars:
           SOURCE_URL: "gs://pdp-feeds-staging/RelayWorldBank/hnp_stats_csv/HNP_StatsCountry.csv"
           SOURCE_FILE: "files/data.csv"
-          COLUMN_TO_REMOVE: "Unnamed: 20"
+          COLUMN_TO_REMOVE: "Unnamed: 30"
           TARGET_FILE: "files/data_output.csv"
           TARGET_GCS_BUCKET: "{{ var.json.shared.composer_bucket }}"
           TARGET_GCS_PATH: "data/world_bank_health_population/country_summary/data_output.csv"
