@@ -64,6 +64,7 @@ with DAG(
         source_format="CSV",
         destination_project_dataset_table="world_bank_health_population.country_summary",
         skip_leading_rows=1,
+        allow_quoted_newlines=True,
         write_disposition="WRITE_TRUNCATE",
         schema_fields=[
             {"name": "country_code", "type": "string", "mode": "nullable"},

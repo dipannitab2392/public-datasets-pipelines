@@ -50,33 +50,36 @@ def main(
     download_file(source_url, source_file)
 
     logging.info(f"Opening file {source_file}")
-    df = pd.read_csv(source_file)
+    df = pd.read_csv(source_file, skip_blank_lines=True)
 
     logging.info(f"Transforming {source_file} ... ")
 
     logging.info(f"Transform: Dropping column {column_name} ...")
-    delete_column(df,column_name)
+    delete_column(df, column_name)
 
     logging.info(f"Transform: Renaming columns for {pipeline_name} ...")
     rename_headers(df, rename_mappings)
 
-    if pipeline_name == 'series_times' :
+    if pipeline_name == "series_times":
         logging.info(f"Transform: Extracting year for {pipeline_name} ...")
-        df['year'] = df['year'].apply(extract_year)
-    else :
-        df=df
-
-    if pipeline_name == 'country_summary' :
-        logging.info(f"Transform: Creating a new column ...")
-        df['latest_water_withdrawal_data'] = ''
-
-        logging.info(f"Transform: converting to integer ... ")
-        df["latest_industrial_data"] = df["latest_industrial_data"].apply(convert_to_integer_string)
-        df["latest_trade_data"] = df["latest_trade_data"].apply(convert_to_integer_string)
-
-    else :
+        df["year"] = df["year"].apply(extract_year)
+    else:
         df = df
 
+    if pipeline_name == "country_summary":
+        logging.info("Transform: Creating a new column ...")
+        df["latest_water_withdrawal_data"] = ""
+
+        logging.info("Transform: converting to integer ... ")
+        df["latest_industrial_data"] = df["latest_industrial_data"].apply(
+            convert_to_integer_string
+        )
+        df["latest_trade_data"] = df["latest_trade_data"].apply(
+            convert_to_integer_string
+        )
+
+    else:
+        df = df
 
     logging.info(f"Transform: Reordering headers for {pipeline_name} ...")
     df = df[headers]
@@ -98,22 +101,26 @@ def main(
     )
 
 
-
-def download_file(source_url, source_file) :
+def download_file(source_url: str, source_file: pathlib.Path) -> None:
     subprocess.check_call(["gsutil", "cp", f"{source_url}", f"{source_file}"])
+
 
 def rename_headers(df: pd.DataFrame, rename_mappings: dict) -> None:
     df.rename(columns=rename_mappings, inplace=True)
 
-def delete_column(df,column_name) :
+
+def delete_column(df: pd.DataFrame, column_name: str) -> None:
     df = df.drop(column_name, axis=1, inplace=True)
 
-def extract_year(string_val : str ) :
+
+def extract_year(string_val: str) -> str:
     string_val = string_val[2:]
     return string_val
 
+
 def save_to_new_file(df: pd.DataFrame, file_path: str) -> None:
     df.to_csv(file_path, index=False)
+
 
 def convert_to_integer_string(input: typing.Union[str, float]) -> str:
     str_val = ""

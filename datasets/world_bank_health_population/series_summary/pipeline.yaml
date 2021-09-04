@@ -96,6 +96,7 @@ dag:
 
         # Use this if your CSV file contains a header row
         skip_leading_rows: 1
+        allow_quoted_newlines: True
 
         # How to write data to the table: overwrite, append, or write if empty
         # See https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/WriteDisposition
