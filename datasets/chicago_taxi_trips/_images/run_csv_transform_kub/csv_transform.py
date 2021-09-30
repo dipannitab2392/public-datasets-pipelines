@@ -48,7 +48,7 @@ def main(
     pathlib.Path("./files").mkdir(parents=True, exist_ok=True)
 
     logging.info(f"Downloading file from {source_url}...")
-    # download_file(source_url, source_file)
+    download_file(source_url, source_file)
 
     logging.info(f"Opening file {source_file}...")
     with pd.read_csv(
@@ -96,7 +96,6 @@ def main(
                 )
             subprocess.run(["rm", target_file_batch])
 
-
             # logging.info(f"Saving to output file.. {target_file}")
             # try:
             #     save_to_new_file(df, file_path=str(target_file))
@@ -123,6 +122,7 @@ def processChunk(df: pd.DataFrame, target_file_batch: str) -> None:
         logging.error(f"Error saving output file: {e}.")
     logging.info("..Done!")
 
+
 def integer_string(input: typing.Union[str, float]) -> str:
     str_val = ""
     if not input or (math.isnan(input)):
@@ -131,12 +131,18 @@ def integer_string(input: typing.Union[str, float]) -> str:
         str_val = str(int(round(input, 0)))
     return str_val
 
-def convert_to_integer_string(df) :
-    col=["trip_seconds","pickup_census_tract","dropoff_census_tract","pickup_community_area","dropoff_community_area"]
 
-    for columns in col :
+def convert_to_integer_string(df):
+    col = [
+        "trip_seconds",
+        "pickup_census_tract",
+        "dropoff_census_tract",
+        "pickup_community_area",
+        "dropoff_community_area",
+    ]
+
+    for columns in col:
         df[columns] = df[columns].apply(integer_string)
-
 
 
 def rename_headers(df: pd.DataFrame, rename_mappings: dict) -> None:
@@ -153,6 +159,7 @@ def rename_headers(df: pd.DataFrame, rename_mappings: dict) -> None:
 #             "%Y-%m-%d %H:%M:%S"
 #         )
 
+
 def convert_dt_format(dt_str: str) -> str:
     # Old format: MM/dd/yyyy hh:mm:ss aa
     # New format: yyyy-MM-dd HH:mm:ss
@@ -164,11 +171,9 @@ def convert_dt_format(dt_str: str) -> str:
             "%Y-%m-%d %H:%M:%S"
         )
 
+
 def convert_values(df):
-    dt_cols = [
-        "trip_end_timestamp" ,
-        "trip_start_timestamp"
-    ]
+    dt_cols = ["trip_end_timestamp", "trip_start_timestamp"]
 
     for dt_col in dt_cols:
         df[dt_col] = df[dt_col].apply(convert_dt_format)
@@ -176,16 +181,22 @@ def convert_values(df):
 
 def filter_null_rows(df):
     df = df.query('unique_key != "" | taxi_id !="" ')
+    df = df.dropna(subset=["unique_key", "taxi_id"])
 
-def reg_exp_tranformation (str_value,search_pattern,replace_val) :
+
+def reg_exp_tranformation(str_value, search_pattern, replace_val):
     str_value = re.sub(search_pattern, replace_val, str_value)
     return str_value
 
-def search_and_replace(df) :
-    col = ["fare","tips","tolls","extras","trip_total"]
 
-    for col in col :
-        df[col] = df[col].astype("str").apply(reg_exp_tranformation,args=(r"[^0-9.]",""))
+def search_and_replace(df):
+    col = ["fare", "tips", "tolls", "extras", "trip_total"]
+
+    for col in col:
+        df[col] = (
+            df[col].astype("str").apply(reg_exp_tranformation, args=(r"[^0-9.]", ""))
+        )
+
 
 def save_to_new_file(df: pd.DataFrame, file_path: str) -> None:
     df.to_csv(file_path, index=False)
