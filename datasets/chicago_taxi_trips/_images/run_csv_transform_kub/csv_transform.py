@@ -181,7 +181,9 @@ def convert_values(df):
 
 def filter_null_rows(df):
     df = df.query('unique_key != "" | taxi_id !="" ')
-    df = df.dropna(subset=["unique_key", "taxi_id"],inplace=True)
+    # df = df.dropna(subset=["unique_key", "taxi_id"],inplace=True)
+    df = df[df['taxi_id'].isnull() == False ]
+    df = df[df['taxi_id'].isna() == False ]
 
 
 def reg_exp_tranformation(str_value, search_pattern, replace_val):
