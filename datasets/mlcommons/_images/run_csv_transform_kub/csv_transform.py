@@ -73,7 +73,8 @@ def download_file(
 ) -> None:
     for url, file in zip(source_urls, source_files):
         logging.info(f"Downloading file from {url} ...")
-        subprocess.check_call(["gsutil", "-i", "public-data-mlcommons-speech@bigquery-public-data-dev.iam.gserviceaccount.com","cp", f"{url}", f"{file}"])
+        subprocess.check_call(["gsutil", "cp", f"{url}", f"{file}"])
+        # subprocess.check_call(["gsutil", "-i", "public-data-mlcommons-speech@bigquery-public-data-dev.iam.gserviceaccount.com","cp", f"{url}", f"{file}"])
 
 
 def read_file_to_dataframe(source_files) :
