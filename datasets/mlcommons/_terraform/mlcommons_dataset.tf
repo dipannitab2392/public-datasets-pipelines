@@ -18,7 +18,7 @@
 resource "google_bigquery_dataset" "mlcommons" {
   dataset_id  = "mlcommons"
   project     = var.project_id
-  description = "Overview: This dataset includes economic statistics on inflation, prices, unemployment, and pay \u0026 benefits provided by the Bureau of Labor Statistics (mlcommons).\n\nUpdate frequency: Monthly\n\nDataset source: U.S. Bureau of Labor Statistics\n\nTerms of use: This dataset is publicly available for anyone to use under the following terms provided by the Dataset Source -\u00a0http://www.data.gov/privacy-policy#data_policy\u00a0- and is provided \"AS IS\" without any warranty, express or implied, from Google. Google disclaims all liability for any damages, direct or indirect, resulting from the use of the dataset.\n\nSee the GCP Marketplace listing for more details and sample queries: https://console.cloud.google.com/marketplace/details/mlcommons-public-data/bureau-of-labor-statistics"
+  description = "ML Commns dataset"
 }
 
 output "bigquery_dataset-mlcommons-dataset_id" {
