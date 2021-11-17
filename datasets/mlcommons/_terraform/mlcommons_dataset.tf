@@ -26,8 +26,10 @@ output "bigquery_dataset-mlcommons-dataset_id" {
 }
 
 resource "google_storage_bucket" "mlcommons" {
-  name          = "${var.bucket_name_prefix}-mlcommons"
-  force_destroy = true
+  name                        = "${var.bucket_name_prefix}-mlcommons"
+  force_destroy               = true
+  location                    = "US"
+  uniform_bucket_level_access = true
 }
 
 output "storage_bucket-mlcommons-name" {

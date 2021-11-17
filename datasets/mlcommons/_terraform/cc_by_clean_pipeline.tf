@@ -15,12 +15,12 @@
  */
 
 
-resource "google_bigquery_table" "mlcommons_cc_by_clean_new" {
+resource "google_bigquery_table" "mlcommons_cc_by_clean" {
   project    = var.project_id
   dataset_id = "mlcommons"
-  table_id   = "cc_by_clean_new"
+  table_id   = "cc_by_clean"
 
-  description = "cc_by_clean_new Dataset"
+  description = "cc_by_clean Dataset"
 
 
 
@@ -30,10 +30,10 @@ resource "google_bigquery_table" "mlcommons_cc_by_clean_new" {
   ]
 }
 
-output "bigquery_table-mlcommons_cc_by_clean_new-table_id" {
-  value = google_bigquery_table.mlcommons_cc_by_clean_new.table_id
+output "bigquery_table-mlcommons_cc_by_clean-table_id" {
+  value = google_bigquery_table.mlcommons_cc_by_clean.table_id
 }
 
-output "bigquery_table-mlcommons_cc_by_clean_new-id" {
-  value = google_bigquery_table.mlcommons_cc_by_clean_new.id
+output "bigquery_table-mlcommons_cc_by_clean-id" {
+  value = google_bigquery_table.mlcommons_cc_by_clean.id
 }

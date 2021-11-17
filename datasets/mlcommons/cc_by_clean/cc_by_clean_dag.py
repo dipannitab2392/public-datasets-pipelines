@@ -14,8 +14,7 @@
 
 
 from airflow import DAG
-from airflow.providers.google.cloud.operators import kubernetes_engine
-from airflow.providers.google.cloud.transfers import gcs_to_bigquery
+from airflow.contrib.operators import gcs_to_bq, kubernetes_pod_operator
 
 default_args = {
     "owner": "Google",
@@ -33,31 +32,44 @@ with DAG(
     default_view="graph",
 ) as dag:
 
-    # Run CSV transform within GKES pod
-    transform_csv = kubernetes_engine.GKEStartPodOperator(
+    # Run CSV transform within kubernetes pod
+    transform_csv = kubernetes_pod_operator.KubernetesPodOperator(
         task_id="transform_csv",
-        project_id="{{ var.value.gcp_project_id }}",
-        location="{{ var.value.gcp_location }}",
-        cluster_name="GKE_CLUSTER_NAME",
-        use_internal_ip=True,
-        impersonation_chain="{{ var.json.mlcommons.service_account }}",
-        namespace="default",
+        startup_timeout_seconds=600,
         name="cc_by_clean",
+        namespace="default",
+        affinity={
+            "nodeAffinity": {
+                "requiredDuringSchedulingIgnoredDuringExecution": {
+                    "nodeSelectorTerms": [
+                        {
+                            "matchExpressions": [
+                                {
+                                    "key": "cloud.google.com/gke-nodepool",
+                                    "operator": "In",
+                                    "values": ["pool-e2-standard-4"],
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
         image_pull_policy="Always",
         image="{{ var.json.mlcommons.container_registry.run_csv_transform_kub }}",
         env_vars={
-            "SOURCE_URLS": '["gs://the-peoples-speech-west-europe/forced-aligner/cuda-forced-aligner/peoples-speech/cc_by_clean/dataset_manifest_single/part-00000-38582da5-5171-420f-a074-ca0fb80cbef1-c000.json"]',
+            "SOURCE_URLS": '["gs://pdp-public-data-dev-test-dataflow/mlcommons/cc_by_clean/data.json"]',
             "SOURCE_FILES": '["files/data.json"]',
             "TARGET_FILE": "files/data_output.csv",
             "TARGET_GCS_BUCKET": "{{ var.value.composer_bucket }}",
             "TARGET_GCS_PATH": "data/mlcommons/cc_by_clean/data_output.csv",
             "PIPELINE_NAME": "cc_by_clean",
         },
-        do_xcom_push=True,
+        resources={"request_memory": "3G", "request_cpu": "1"},
     )
 
     # Task to load CSV data to a BigQuery table
-    load_to_bq = gcs_to_bigquery.GCSToBigQueryOperator(
+    load_to_bq = gcs_to_bq.GoogleCloudStorageToBigQueryOperator(
         task_id="load_to_bq",
         bucket="{{ var.value.composer_bucket }}",
         source_objects=["data/mlcommons/cc_by_clean/data_output.csv"],

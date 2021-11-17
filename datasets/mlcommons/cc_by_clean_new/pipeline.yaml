@@ -37,6 +37,7 @@ dag:
     - operator: "GKEStartPodOperator"
       description: "Run CSV transform within GKES pod"
 
+
       args:
         task_id: "transform_csv"
         project_id: "{{ var.value.gcp_project_id }}"

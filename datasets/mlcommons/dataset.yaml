@@ -35,3 +35,5 @@ resources:
       See the GCP Marketplace listing for more details and sample queries: https://console.cloud.google.com/marketplace/details/mlcommons-public-data/bureau-of-labor-statistics
   - type: storage_bucket
     name: mlcommons
+    uniform_bucket_level_access: True
+    location: US
