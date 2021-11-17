@@ -25,7 +25,7 @@ default_args = {
 
 
 with DAG(
-    dag_id="mlcommons.cc_by_clean",
+    dag_id="mlcommons.cc_by_clean_new",
     default_args=default_args,
     max_active_runs=1,
     schedule_interval="@daily",
@@ -42,16 +42,16 @@ with DAG(
         use_internal_ip=True,
         impersonation_chain="{{ var.json.mlcommons.service_account }}",
         namespace="default",
-        name="cc_by_clean",
+        name="cc_by_clean_new",
         image_pull_policy="Always",
         image="{{ var.json.mlcommons.container_registry.run_csv_transform_kub }}",
         env_vars={
-            "SOURCE_URLS": '["gs://the-peoples-speech-west-europe/forced-aligner/cuda-forced-aligner/peoples-speech/cc_by_clean/dataset_manifest_single/part-00000-38582da5-5171-420f-a074-ca0fb80cbef1-c000.json"]',
+            "SOURCE_URLS": '["gs://the-peoples-speech-west-europe/forced-aligner/cuda-forced-aligner/peoples-speech/cc_by_clean_new/dataset_manifest_single/part-00000-38582da5-5171-420f-a074-ca0fb80cbef1-c000.json"]',
             "SOURCE_FILES": '["files/data.json"]',
             "TARGET_FILE": "files/data_output.csv",
             "TARGET_GCS_BUCKET": "{{ var.value.composer_bucket }}",
-            "TARGET_GCS_PATH": "data/mlcommons/cc_by_clean/data_output.csv",
-            "PIPELINE_NAME": "cc_by_clean",
+            "TARGET_GCS_PATH": "data/mlcommons/cc_by_clean_new/data_output.csv",
+            "PIPELINE_NAME": "cc_by_clean_new",
         },
         do_xcom_push=True,
     )
@@ -60,9 +60,9 @@ with DAG(
     load_to_bq = gcs_to_bigquery.GCSToBigQueryOperator(
         task_id="load_to_bq",
         bucket="{{ var.value.composer_bucket }}",
-        source_objects=["data/mlcommons/cc_by_clean/data_output.csv"],
+        source_objects=["data/mlcommons/cc_by_clean_new/data_output.csv"],
         source_format="CSV",
-        destination_project_dataset_table="mlcommons.cc_by_clean",
+        destination_project_dataset_table="mlcommons.cc_by_clean_new",
         skip_leading_rows=1,
         allow_quoted_newlines=True,
         write_disposition="WRITE_TRUNCATE",
