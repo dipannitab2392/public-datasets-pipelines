@@ -82,6 +82,7 @@ def read_file_to_dataframe(source_files) :
         with open(file) as f:
             data = [json.loads(line) for line in f]
     df = pd.json_normalize(data)
+    df= df.explode(['training_data.duration_ms', 'training_data.label','training_data.name'])
     return df
 
 def save_to_new_file(df: pd.DataFrame, file_path: str) -> None:
