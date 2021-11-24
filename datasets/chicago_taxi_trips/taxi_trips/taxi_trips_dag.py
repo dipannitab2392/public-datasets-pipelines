@@ -64,7 +64,7 @@ with DAG(
             "TARGET_GCS_PATH": "data/chicago_taxi_trips/taxi_trips/data_output.csv",
             "RENAME_MAPPINGS": '{"Trip ID" : "unique_key" ,"Taxi ID" : "taxi_id" ,"Trip Start Timestamp" : "trip_start_timestamp" ,"Trip End Timestamp" : "trip_end_timestamp" ,"Trip Seconds" : "trip_seconds" ,"Trip Miles" : "trip_miles" ,"Pickup Census Tract" : "pickup_census_tract" ,"Dropoff Census Tract" : "dropoff_census_tract" ,"Pickup Community Area" : "pickup_community_area" ,"Dropoff Community Area" : "dropoff_community_area" ,"Fare" : "fare" ,"Tips" : "tips" ,"Tolls" : "tolls" ,"Extras" : "extras" ,"Trip Total" : "trip_total" ,"Payment Type" : "payment_type" ,"Company" : "company" ,"Pickup Centroid Latitude" : "pickup_latitude" ,"Pickup Centroid Longitude" : "pickup_longitude" ,"Pickup Centroid Location" : "pickup_location" ,"Dropoff Centroid Latitude" : "dropoff_latitude" ,"Dropoff Centroid Longitude" : "dropoff_longitude" ,"Dropoff Centroid  Location" : "dropoff_location"}',
         },
-        resources={"request_memory": "8G", "request_cpu": "3"},
+        resources={"request_memory": "3G", "request_cpu": "1"},
     )
 
     # Task to load CSV data to a BigQuery table
@@ -82,13 +82,13 @@ with DAG(
                 "name": "unique_key",
                 "type": "string",
                 "description": "Unique identifier for the trip.",
-                "mode": "required",
+                "mode": "nullable",
             },
             {
                 "name": "taxi_id",
                 "type": "string",
                 "description": "A unique identifier for the taxi.",
-                "mode": "required",
+                "mode": "nullable",
             },
             {
                 "name": "trip_start_timestamp",
