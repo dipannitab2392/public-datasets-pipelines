@@ -40,7 +40,7 @@ with DAG(
         location="{{ var.value.gcp_location }}",
         cluster_name="GKE_CLUSTER_NAME",
         use_internal_ip=True,
-        impersonation_chain="{{ var.json.mlcommons.service_account }}",
+        service_account_name="{{ var.json.mlcommons.service_account }}",
         namespace="default",
         name="cc_by_clean_new",
         image_pull_policy="Always",
