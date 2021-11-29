@@ -19,8 +19,10 @@ import os
 import pathlib
 import re
 import subprocess
+import tarfile
 import typing
 
+import gcsfs
 import pandas as pd
 from google.cloud import storage
 
@@ -35,6 +37,9 @@ def main(
     pipeline_name: str,
     # joining_key: str,
     # columns: typing.List[str],
+    source_file_tar: str,
+    extraction_location: pathlib.Path,
+    upload_location: str
 ) -> None:
 
     logging.info(
@@ -48,8 +53,17 @@ def main(
     logging.info("Download file...")
     download_file(source_urls, source_files)
 
-    logging.info("Read file to a datafrmae...")
-    df=read_file_to_dataframe(source_files)
+    logging.info("Read json file to a datafrmae...")
+    df_json=read_file_to_dataframe(source_files)
+
+    logging.info("Processing tar file....")
+    # meta_data=process_tar_file(source_file_tar,extraction_location,upload_location)
+    # df_tar=pd.DataFrame(meta_data,columns=['file_name','file_current_location','file_upload_location'])
+    df_tar=process_tar_file(source_file_tar,extraction_location,upload_location)
+
+    logging.info("Read files to a datafrmae...")
+    df=pd.merge(df_json,df_tar[['file_name','file_upload_location']],how="left",left_on='training_data.name',right_on='file_name').drop(columns= ['file_name'])
+
 
     logging.info(f"Saving to output file.. {target_file}")
     try:
@@ -88,6 +102,39 @@ def read_file_to_dataframe(source_files) :
 def save_to_new_file(df: pd.DataFrame, file_path: str) -> None:
     df.to_csv(file_path, index=False)
 
+def process_tar_file(source_file_tar,extraction_location,upload_location) :
+    fs = gcsfs.GCSFileSystem(project="bigquery-public-data-dev")
+    meta_data=[]
+
+    with fs.open(source_file_tar) as f:
+        tar = tarfile.open(fileobj=f, mode='r:')
+        number_of_file=len(tar.getnames())
+        logging.info(f"Extracting files at {extraction_location}")
+        f=tar.extractall(path=extraction_location)
+        logging.info("Extraction completed...")
+        count=0
+        for member in tar.getmembers():
+            file_name = member.name
+            file_current_location= extraction_location + file_name
+            file_upload_location = upload_location+file_name
+            temp=[]
+            # temp =  list(map(lambda x : x[1], filter(lambda x : x[0].startswith('file_'), globals().items())))
+            temp.extend([file_name,file_current_location,file_upload_location])
+            meta_data.append(temp)
+            count=count+1
+            logging.info(f'Uploading {count} out of {number_of_file} file to GCS bucket, file name : {file_name} ...')
+            upload_flac_files(file_current_location,file_upload_location)
+            # logging.info('print temp...')
+            # logging.info(temp)
+        # logging.info('print metadat :')
+        # logging.info(meta_data)
+        logging.info('Files uploaded...')
+    df_tar=pd.DataFrame(meta_data,columns=['file_name','file_current_location','file_upload_location'])
+    return df_tar
+
+
+def upload_flac_files(file_current_location: str,file_upload_location: str) -> None :
+    subprocess.check_call(["gsutil", "cp", f"{file_current_location}", f"{file_upload_location}"])
 
 def upload_file_to_gcs(file_path: pathlib.Path, gcs_bucket: str, gcs_path: str) -> None:
     storage_client = storage.Client()
@@ -109,4 +156,7 @@ if __name__ == "__main__":
         pipeline_name=os.environ["PIPELINE_NAME"],
         # joining_key=os.environ["JOINING_KEY"],
         # columns=json.loads(os.environ["TRIM_SPACE"]),
+        source_file_tar=os.environ["SOURCE_FILE_TAR"],
+        extraction_location=os.environ["EXTRACTION_LOCATION"],
+        upload_location=os.environ["UPLOAD_LOCATION"]
     )

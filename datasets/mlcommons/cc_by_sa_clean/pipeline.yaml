@@ -16,13 +16,13 @@
 resources:
 
   - type: bigquery_table
-    table_id: cc_by_clean
-    description: "cc_by_clean Dataset"
+    table_id: cc_by_sa_clean
+    description: "cc_by_sa_clean table"
 
 dag:
   airflow_version: 1
   initialize:
-    dag_id: "cc_by_clean"
+    dag_id: "cc_by_sa_clean"
     default_args:
       owner: "Google"
 
@@ -40,7 +40,7 @@ dag:
       args:
         task_id: "transform_csv"
         startup_timeout_seconds: 600
-        name: "cc_by_clean"
+        name: "cc_by_sa_clean"
         namespace: "default"
         affinity:
           nodeAffinity:
@@ -55,16 +55,16 @@ dag:
         image: "{{ var.json.mlcommons.container_registry.run_csv_transform_kub }}"
         env_vars:
           SOURCE_URLS: >-
-            ["gs://pdp-public-data-dev-test-dataflow/mlcommons/cc_by_clean/data.json"]
+            ["gs://pdp-public-data-dev-test-dataflow/mlcommons/cc_by_sa_clean/data.json"]
           SOURCE_FILES: >-
             ["files/data.json"]
           TARGET_FILE: "files/data_output.csv"
           TARGET_GCS_BUCKET: "{{ var.value.composer_bucket }}"
-          TARGET_GCS_PATH: "data/mlcommons/cc_by_clean/data_output.csv"
-          PIPELINE_NAME: "cc_by_clean"
-          SOURCE_FILE_TAR: "pdp-public-data-dev-test-dataflow/mlcommons/cc_by_clean/data_main.tar"
+          TARGET_GCS_PATH: "data/mlcommons/cc_by_sa_clean/data_output.csv"
+          PIPELINE_NAME: "cc_by_sa_clean"
+          SOURCE_FILE_TAR: "pdp-public-data-dev-test-dataflow/mlcommons/cc_by_sa_clean/data_main.tar"
           EXTRACTION_LOCATION: "files/extracted_folder/"
-          UPLOAD_LOCATION: "gs://pdp-public-data-dev-test-dataflow/mlcommons/cc_by_clean/tar_extracted_files/"
+          UPLOAD_LOCATION: "gs://pdp-public-data-dev-test-dataflow/mlcommons/cc_by_sa_clean/tar_extracted_files/"
           # FILE_PATH: "files/"
           # JOINING_KEY: "item_code"
           # TRIM_SPACE: >-
@@ -81,9 +81,9 @@ dag:
       args:
         task_id: "load_to_bq"
         bucket: "{{ var.value.composer_bucket }}"
-        source_objects: ["data/mlcommons/cc_by_clean/data_output.csv"]
+        source_objects: ["data/mlcommons/cc_by_sa_clean/data_output.csv"]
         source_format: "CSV"
-        destination_project_dataset_table: "mlcommons.cc_by_clean"
+        destination_project_dataset_table: "mlcommons.cc_by_sa_clean"
         skip_leading_rows: 1
         allow_quoted_newlines: True
         write_disposition: "WRITE_TRUNCATE"

@@ -64,6 +64,9 @@ with DAG(
             "TARGET_GCS_BUCKET": "{{ var.value.composer_bucket }}",
             "TARGET_GCS_PATH": "data/mlcommons/cc_by_clean/data_output.csv",
             "PIPELINE_NAME": "cc_by_clean",
+            "SOURCE_FILE_TAR": "pdp-public-data-dev-test-dataflow/mlcommons/cc_by_clean/data_main.tar",
+            "EXTRACTION_LOCATION": "files/extracted_folder/",
+            "UPLOAD_LOCATION": "gs://pdp-public-data-dev-test-dataflow/mlcommons/cc_by_clean/tar_extracted_files/",
         },
         resources={"request_memory": "3G", "request_cpu": "1"},
     )
@@ -85,6 +88,7 @@ with DAG(
             {"name": "duration_ms", "type": "STRING", "mode": "NULLABLE"},
             {"name": "label", "type": "STRING", "mode": "NULLABLE"},
             {"name": "name", "type": "STRING", "mode": "NULLABLE"},
+            {"name": "location", "type": "STRING", "mode": "NULLABLE"},
         ],
     )
 

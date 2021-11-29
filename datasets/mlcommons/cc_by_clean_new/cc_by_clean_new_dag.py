@@ -36,8 +36,8 @@ with DAG(
     # Run CSV transform within GKES pod
     transform_csv = kubernetes_engine.GKEStartPodOperator(
         task_id="transform_csv",
-        project_id="{{ var.value.gcp_project_id }}",
-        location="{{ var.value.gcp_location }}",
+        project_id="{{ var.json.mlcommons.gcp_project_id }}",
+        location="{{ var.json.mlcommons.gcp_location }}",
         cluster_name="GKE_CLUSTER_NAME",
         use_internal_ip=True,
         service_account_name="{{ var.json.mlcommons.service_account }}",
