@@ -109,26 +109,30 @@ def process_tar_file(source_file_tar,extraction_location,upload_location) :
     with fs.open(source_file_tar) as f:
         tar = tarfile.open(fileobj=f, mode='r:')
         number_of_file=len(tar.getnames())
-        logging.info(f"Extracting files at {extraction_location}")
-        f=tar.extractall(path=extraction_location)
-        logging.info("Extraction completed...")
+        # logging.info(f"Extracting files at {extraction_location}")
+        # f=tar.extractall(path=extraction_location)
+        # logging.info("Extraction completed...")
         count=0
         for member in tar.getmembers():
             file_name = member.name
             file_current_location= extraction_location + file_name
             file_upload_location = upload_location+file_name
+            logging.info(f'Processing {count} out of {number_of_file} files...')
+            logging.info(f'Extracting file {file_name}...')
+            f = tar.extract(member,extraction_location,numeric_owner=True)
+            logging.info('Extraction completed...')
             temp=[]
             # temp =  list(map(lambda x : x[1], filter(lambda x : x[0].startswith('file_'), globals().items())))
             temp.extend([file_name,file_current_location,file_upload_location])
             meta_data.append(temp)
             count=count+1
-            logging.info(f'Uploading {count} out of {number_of_file} file to GCS bucket, file name : {file_name} ...')
+            logging.info(f'Uploading file {file_name} to GCS bucket...')
             upload_flac_files(file_current_location,file_upload_location)
             # logging.info('print temp...')
             # logging.info(temp)
         # logging.info('print metadat :')
         # logging.info(meta_data)
-        logging.info('Files uploaded...')
+        logging.info('All files processed...')
     df_tar=pd.DataFrame(meta_data,columns=['file_name','file_current_location','file_upload_location'])
     return df_tar
 
